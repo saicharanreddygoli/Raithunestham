@@ -3,98 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - Admin</title>
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #f4faf4;
+            --primary: #2f7d32;
+            --primary-dark: #1f5d23;
+            --accent: #f6c453;
+            --surface: #ffffff;
+            --surface-muted: rgba(255,255,255,0.7);
+            --text: #1c201c;
+            --text-muted: #566156;
+            --shadow: 0 18px 48px rgba(31, 92, 35, 0.16);
+        }
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #e8f5e9;
             margin: 0;
-            padding: 20px;
+            min-height: 100vh;
+            background: var(--bg);
+            font-family: 'Inter', 'Noto Sans Telugu', 'Noto Sans Devanagari', system-ui, sans-serif;
+            color: var(--text);
         }
-        .container {
-            max-width: 600px;
+        .page-shell { min-height: 100vh; display: flex; flex-direction: column; }
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.15);
+        }
+        .top-bar .inner {
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+        .content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 32px auto 48px;
+            padding: 0 28px;
+            display: grid;
+            gap: 28px;
+        }
+        .hero-card {
+            background: var(--surface);
+            border-radius: 26px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            align-items: center;
+        }
+        .hero-card h1 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.9rem, 4vw, 2.3rem);
+            color: var(--primary-dark);
+        }
+        .hero-card p {
+            margin: 10px 0 0;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .hero-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .badge-soft {
+            background: rgba(46, 125, 50, 0.1);
+            color: var(--primary-dark);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-pill {
+            border-radius: 16px;
+            padding: 12px 20px;
+            font-weight: 600;
+        }
+        .btn-primary { background: var(--primary); border: none; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-soft {
+            border: 1px solid rgba(46, 125, 50, 0.2);
+            background: rgba(46, 125, 50, 0.08);
+            color: var(--primary-dark);
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border-radius: 18px;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow);
         }
-        h1 {
-            color: #2e7d32;
-            text-align: center;
+        .metric-card h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
-        h2 {
-            color: #388e3c;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
+        .metric-card strong {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #1b5e20;
+            margin-top: 6px;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
         }
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
+        .grid-two {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            gap: 24px;
         }
-        button {
-            background-color: #2e7d32;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            display: block;
-            margin: 0 auto;
+        .panel {
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
-        button:hover {
-            background-color: #1b5e20;
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
-        .message {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f1f8e9;
-            border-radius: 4px;
+        .panel-header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .table-wrapper {
+            border-radius: 16px;
+            border: 1px solid rgba(46, 125, 50, 0.12);
+            overflow: hidden;
+        }
+        table { margin: 0; }
+        thead {
+            background: rgba(46, 125, 50, 0.12);
+            color: var(--primary-dark);
+        }
+        tbody td { vertical-align: middle; }
+        .status-badge {
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-open { background: rgba(46,125,50,0.12); color: var(--primary-dark); }
+        .status-progress { background: rgba(246, 196, 83, 0.22); color: #805300; }
+        .status-completed { background: rgba(76, 175, 80, 0.18); color: var(--primary-dark); }
+        .status-declined { background: rgba(216, 67, 21, 0.18); color: #8b2a0a; }
+        .empty-state {
             text-align: center;
+            border-radius: 16px;
+            background: rgba(46, 125, 50, 0.08);
+            color: var(--primary-dark);
+            padding: 18px;
         }
-        .error {
-            color: red;
+        .list-unstyled li + li { border-top: 1px solid rgba(46, 125, 50, 0.12); }
+        footer {
+            padding: 28px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        @media (max-width: 960px) {
+            .grid-two { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 576px) {
+            .top-bar .inner { padding: 12px 18px; }
+            .content { padding: 0 18px; }
+            .panel { padding: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome Admin</h1>
-        <h2>Assign Task to Location</h2>
-        <form method="POST">
-            <div class="form-group">
-                <label for="village">Village (Gudlavalleru Mandal)</label>
-                <select id="village" name="village" required>
-                    <option value="">Select Village</option>
-                    {% for village in villages %}
-                        <option value="{{ village }}">{{ village|capitalize }}</option>
-                    {% endfor %}
-                </select>
+<div class="page-shell">
+    <header class="top-bar">
+        <div class="inner">
+            <a class="brand-link" href="/" data-i18n="hero.title">Welcome</a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
             </div>
-            <div class="form-group">
-                <label for="task">Task</label>
-                <select id="task" name="task" required>
-                    {% for t in tasks %}
-                        <option value="{{ t }}">{{ t }}</option>
-                    {% endfor %}
-                </select>
+        </div>
+    </header>
+
+    <main>
+        <div class="content">
+            <section class="hero-card">
+                <div>
+                    <div class="hero-badges">
+                        <span class="badge-soft" data-i18n="admin.badge">Admin control center</span>
+                        <span class="badge-soft">{{ stats.open_tasks }} open tasks</span>
+                    </div>
+                    <h1 data-i18n="admin.title">Monitor village collaboration</h1>
+                    <p data-i18n="admin.subtitle">
+                        Track farmer tasks, worker engagement, and volunteer assistance in a single view. Use these insights to coordinate support quickly across Gudlavalleru mandal.
+                    </p>
+                </div>
+                <div class="hero-actions">
+                    <a href="#tasks" class="btn btn-primary btn-pill" data-i18n="admin.cta.view_tasks">View recent tasks</a>
+                    <a href="#requests" class="btn btn-soft btn-pill" data-i18n="admin.cta.review_requests">Review help requests</a>
+                </div>
+            </section>
+
+            <section class="metric-grid">
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.farmers">Farmers</h3>
+                    <strong>{{ stats.farmers }}</strong>
+                </div>
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.workers">Workers</h3>
+                    <strong>{{ stats.workers }}</strong>
+                </div>
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.volunteers">Volunteers</h3>
+                    <strong>{{ stats.volunteers }}</strong>
+                </div>
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.tasks_total">Total tasks</h3>
+                    <strong>{{ stats.tasks }}</strong>
+                </div>
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.tasks_open">Open tasks</h3>
+                    <strong>{{ stats.open_tasks }}</strong>
+                </div>
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.tasks_progress">In progress</h3>
+                    <strong>{{ stats.in_progress_tasks }}</strong>
+                </div>
+                <div class="metric-card">
+                    <h3 data-i18n="admin.metric.tasks_completed">Completed</h3>
+                    <strong>{{ stats.completed_tasks }}</strong>
+                </div>
+            </section>
+
+            <div class="grid-two">
+                <section class="panel" id="tasks">
+                    <div class="panel-header">
+                        <h2 data-i18n="admin.section.recent_tasks">Recent tasks</h2>
+                        <a href="/worker" class="btn btn-soft btn-sm" data-i18n="admin.section.view_worker">Jump to worker view</a>
+                    </div>
+                    {% if recent_tasks %}
+                    <div class="table-wrapper">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" data-i18n="label.task">Task</th>
+                                    <th scope="col" data-i18n="label.village">Village</th>
+                                    <th scope="col" data-i18n="label.workers_needed">Needed</th>
+                                    <th scope="col" data-i18n="label.status">Status</th>
+                                    <th scope="col" data-i18n="label.created_at">Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in recent_tasks %}
+                                <tr>
+                                    <td>{{ task.task }}</td>
+                                    <td>{{ task.village or '—' }}</td>
+                                    <td>{{ task.num_workers }}</td>
+                                    <td>
+                                        {% set status = task.status %}
+                                        <span class="status-badge {% if status == 'open' %}status-open{% elif status == 'in_progress' %}status-progress{% elif status == 'completed' %}status-completed{% else %}status-progress{% endif %}">
+                                            {{ status|replace('_', ' ')|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ task.created_at | timestamp_to_datetime }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state" data-i18n="admin.empty.tasks">No tasks recorded yet.</div>
+                    {% endif %}
+                </section>
+
+                <aside class="panel" id="distribution">
+                    <div class="panel-header">
+                        <h3 data-i18n="admin.section.village_trends">Village task trends</h3>
+                    </div>
+                    {% if village_distribution %}
+                        <ul class="list-unstyled mb-0">
+                            {% for row in village_distribution %}
+                                <li class="py-2 d-flex justify-content-between align-items-center">
+                                    <span>{{ row._id|capitalize }}</span>
+                                    <span class="badge bg-light text-dark">{{ row.count }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="empty-state" data-i18n="admin.empty.distribution">No tasks have been posted yet.</div>
+                    {% endif %}
+                </aside>
             </div>
-            <button type="submit">Assign</button>
-        </form>
-        {% if message %}
-            <p class="message {{ 'error' if 'Please' in message else '' }}">{{ message }}</p>
-        {% endif %}
-    </div>
+
+            <div class="grid-two">
+                <section class="panel" id="requests">
+                    <div class="panel-header">
+                        <h2 data-i18n="admin.section.help_requests">Volunteer help requests</h2>
+                    </div>
+                    {% if recent_requests %}
+                        <div class="table-wrapper">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" data-i18n="admin.table.request_type">Type</th>
+                                        <th scope="col" data-i18n="admin.table.request_owner">Owner</th>
+                                        <th scope="col" data-i18n="label.status">Status</th>
+                                        <th scope="col" data-i18n="label.created_at">Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in recent_requests %}
+                                    <tr>
+                                        <td>{{ req.request_type|replace('_', ' ')|title }}</td>
+                                        <td>
+                                            {% if req.request_type == 'farmer_help' %}
+                                                {{ req.farmer_id }}
+                                            {% else %}
+                                                {{ req.worker_name or 'Worker' }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="status-badge {% if req.status == 'pending' %}status-open{% elif req.status == 'accepted' %}status-completed{% elif req.status == 'declined' %}status-declined{% else %}status-progress{% endif %}">
+                                                {{ req.status|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ req.created_at | timestamp_to_datetime }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state" data-i18n="admin.empty.requests">No volunteer help requests yet.</div>
+                    {% endif %}
+                </section>
+
+                <aside class="panel" id="volunteers">
+                    <div class="panel-header">
+                        <h3 data-i18n="admin.section.new_volunteers">New volunteers</h3>
+                    </div>
+                    {% if recent_volunteers %}
+                        <ul class="list-unstyled mb-0">
+                            {% for vol in recent_volunteers %}
+                                <li class="py-2">
+                                    <strong>{{ vol.name }}</strong><br>
+                                    <span class="text-muted small">{{ vol.village|capitalize }} • {{ vol.phone }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="empty-state" data-i18n="admin.empty.volunteers">No volunteers have registered yet.</div>
+                    {% endif %}
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <span data-i18n="landing.footer.note">Built with communities in Gudlavalleru mandal</span>
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/i18n.js"></script>
 </body>
 </html>

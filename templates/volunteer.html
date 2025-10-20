@@ -1,159 +1,363 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang or 'en' }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Dashboard - Welcome</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>AgriConnect · Volunteer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4CAF50",
+                        "primary-dark": "#388E3C",
+                        "background-light": "#F3F5F2",
+                        "background-dark": "#151a14",
+                        accent: "#FFC107",
+                        supporting: "#8D6E63"
+                    },
+                    fontFamily: {
+                        display: ["Public Sans", "Noto Sans Telugu", "sans-serif"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "0.75rem",
+                        xl: "1rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
     <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
         body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
             min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            margin-top: 50px;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .btn-success {
-            background-color: #2e7d32;
-            border-color: #2e7d32;
-        }
-        .btn-success:hover {
-            background-color: #1b5e20;
-            border-color: #1b5e20;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .alert-warning {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/" data-i18n="hero.title">Welcome</a>
-            <div class="ms-auto d-flex align-items-center gap-2">
-                <span class="small text-muted" data-i18n="nav.language">Language</span>
-                <button class="btn btn-light btn-sm" onclick="switchLanguage('en')">EN</button>
-                <button class="btn btn-light btn-sm" onclick="switchLanguage('te')">TE</button>
-                <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+<body class="bg-background-light font-display text-[#2b2b2b] dark:bg-background-dark dark:text-gray-100">
+    <div class="flex min-h-screen flex-col">
+        <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-4 shadow-sm dark:border-gray-700 dark:bg-background-dark">
+            <div>
+                <p class="text-xs uppercase tracking-[0.4em] text-gray-500 dark:text-gray-500">AgriConnect</p>
+                <h1 class="text-2xl font-bold leading-tight text-[#2b2b2b] dark:text-gray-100">Hello, {{ volunteer.name }}! / హలో {{ volunteer.name }}!</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Coordinate farmers and workers from one place. / రైతులు మరియు కార్మికులను ఒకే స్థానంలో సమన్వయం చేయండి.</p>
             </div>
-        </div>
-    </nav>
-    <div class="container">
-        <h2 class="text-success mb-4">🤝 Volunteer Dashboard - {{ volunteer.name }}</h2>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        {% if message %}
-            <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="flex items-center gap-3">
+                <div class="hidden rounded-xl bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow dark:bg-gray-900 dark:text-gray-200 sm:flex sm:flex-col sm:items-end">
+                    <span class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">location_on</span>
+                        {{ volunteer.village|capitalize }} · గ్రామం
+                    </span>
+                    <span class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                        <span class="material-symbols-outlined text-primary">call</span>
+                        {{ volunteer.phone }} · ఫోన్
+                    </span>
+                </div>
+                <a href="/logout" class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-[#2b2b2b] transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100">
+                    <span class="material-symbols-outlined text-2xl">logout</span>
+                </a>
             </div>
-        {% endif %}
+        </header>
 
-        <div class="card p-4">
-            <h4>Post a New Task</h4>
-            <form method="POST" action="/volunteer">
-                <div class="mb-3">
-                    <label for="village" class="form-label">Village</label>
-                    <select class="form-select" id="village" name="village" required>
-                        <option value="">Select Village</option>
-                        {% for v in villages %}
-                            <option value="{{ v }}">{{ v.capitalize() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="task" class="form-label">Task Type</label>
-                    <select class="form-select" id="task" name="task" required>
-                        <option value="">Select Task</option>
-                        {% for task in tasks %}
-                            <option value="{{ task }}">{{ task }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="wage" class="form-label">Wage (₹/day)</label>
-                    <input type="number" class="form-control" id="wage" name="wage" min="0" step="0.01">
-                </div>
-                <div class="mb-3">
-                    <label for="num_workers" class="form-label">Number of Workers</label>
-                    <input type="number" class="form-control" id="num_workers" name="num_workers" min="1" max="50" value="1">
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success w-100">Post Task</button>
-            </form>
-        </div>
-
-        {% if pending_requests %}
-            <div class="card p-4 mt-4">
-                <h4>Pending Help Requests</h4>
-                <ul class="list-group">
-                    {% for request in pending_requests %}
-                        <li class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <strong>Request from Farmer:</strong> {{ request.farmer_name }}<br>
-                                    <strong>Status:</strong> {{ request.status }}<br>
-                                    <strong>Created at:</strong> {{ request.created_at | timestamp_to_datetime }}
-                                    {% if request.farmer_details %}
-                                        <br><strong>Farmer Details:</strong><br>
-                                        <small class="text-muted">
-                                            Village: {{ request.farmer_details.village or 'Not specified' }}<br>
-                                            Phone: {{ request.farmer_details.phone or 'Not provided' }}<br>
-                                            Location: {{ request.farmer_details.location or 'Not specified' }}
-                                        </small>
-                                    {% endif %}
-                                </div>
-                                <div class="btn-group" role="group">
-                                    <form method="POST" action="/volunteer" style="display: inline;">
-                                        <input type="hidden" name="action" value="accept_request">
-                                        <input type="hidden" name="request_id" value="{{ request._id }}">
-                                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
-                                    </form>
-                                    <form method="POST" action="/volunteer" style="display: inline;">
-                                        <input type="hidden" name="action" value="decline_request">
-                                        <input type="hidden" name="request_id" value="{{ request._id }}">
-                                        <button type="submit" class="btn btn-danger btn-sm">Decline</button>
-                                    </form>
+        <main class="flex-1 pb-24">
+            <section class="space-y-6 px-4 py-6">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, msg in messages %}
+                            <div class="rounded-2xl border border-primary/20 bg-white/90 p-4 text-sm text-[#2b2b2b] shadow dark:border-primary/30 dark:bg-gray-900 dark:text-gray-100">
+                                <div class="flex items-start gap-3">
+                                    <span class="material-symbols-outlined text-primary">info</span>
+                                    <div>
+                                        <p class="font-semibold text-primary">{{ category|capitalize }}</p>
+                                        <p class="mt-1">{{ msg }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% if message %}
+                    <div class="rounded-2xl border border-primary/20 bg-white/90 p-4 text-sm text-[#2b2b2b] shadow dark:border-primary/30 dark:bg-gray-900 dark:text-gray-100">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary">info</span>
+                            <div>
+                                <p class="font-semibold text-primary">{{ message_type|default('Notice')|capitalize }}</p>
+                                <p class="mt-1">{{ message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <section class="grid gap-4 rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900 md:grid-cols-2">
+                    <div class="space-y-3">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Volunteer workspace / సేవకుల కార్యవేదిక</span>
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Guide your community / మీ సమాజాన్ని నడిపించండి</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Accept farmer requests, post tasks for workers, and follow up with volunteer coordination in one dashboard. / రైతుల అభ్యర్థనలను అంగీకరించి, కార్మికులకు పనులను పంపించి, ఒకే డ్యాష్‌బోర్డ్‌లో సమన్వయం చేయండి.
+                        </p>
+                    </div>
+                    <div class="grid gap-3 text-sm text-gray-600 dark:text-gray-300">
+                        <div class="flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
+                            <span class="font-medium text-gray-500 dark:text-gray-400">Pending requests / పెండింగ్ అభ్యర్థనలు</span>
+                            <span class="text-lg font-semibold text-primary">{{ pending_requests|length }}</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
+                            <span class="font-medium text-gray-500 dark:text-gray-400">Tasks posted / పోస్ట్ చేసిన పనులు</span>
+                            <span class="text-lg font-semibold text-primary">{{ volunteer_tasks|length }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Pending Requests / పెండింగ్ అభ్యర్థనలు</h2>
+                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Review & respond / సమీక్షించి స్పందించండి</span>
+                    </div>
+                    {% if pending_requests %}
+                        <div class="grid gap-4">
+                            {% for req in pending_requests %}
+                                <article class="rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
+                                    <header class="flex flex-wrap items-start justify-between gap-3">
+                                        <div>
+                                            <p class="text-sm font-semibold text-primary uppercase tracking-[0.25em]">{{ req.request_type.replace('_', ' ') }}</p>
+                                            {% if req.request_type == 'farmer_help' %}
+                                                <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">Farmer {{ req.farmer_name }} / రైతు {{ req.farmer_name }}</h3>
+                                                {% if req.farmer_details %}
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                        {{ req.farmer_details.village|capitalize }} · {{ req.farmer_details.phone }} · గ్రామం · ఫోన్
+                                                    </p>
+                                                {% endif %}
+                                            {% else %}
+                                                <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">{{ req.worker_details.name }} / కార్మికుడు</h3>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ req.worker_details.phone }} · {{ req.worker_details.village|capitalize }} · ఫోన్ · గ్రామం
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                        <span class="text-xs text-gray-400 dark:text-gray-500">{{ req.created_at | timestamp_to_datetime }}</span>
+                                    </header>
+
+                                    {% if req.request_type == 'farmer_help' %}
+                                        <div class="mt-4 grid gap-4">
+                                            <div class="grid gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                                                <form method="POST" action="/volunteer" class="grid gap-3">
+                                                    <input type="hidden" name="action" value="accept_request">
+                                                    <input type="hidden" name="request_id" value="{{ req.id }}">
+
+                                                    <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                                        <span>Task title / పనിയുടെ శీర్షిక</span>
+                                                        <div>
+                                                            <input list="task-options-{{ loop.index }}" name="task_name" value="General Farm Help"
+                                                                   class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                                            <datalist id="task-options-{{ loop.index }}">
+                                                                {% for task_option in tasks %}
+                                                                    <option value="{{ task_option }}">{{ task_option }}</option>
+                                                                {% endfor %}
+                                                            </datalist>
+                                                        </div>
+                                                    </label>
+
+                                                    <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                                        <span>Village / గ్రామం</span>
+                                                        <select name="task_village" class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                                            {% for v in villages %}
+                                                                <option value="{{ v }}" {% if req.farmer_details and req.farmer_details.village and req.farmer_details.village.lower() == v.lower() %}selected{% endif %}>{{ v|capitalize }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </label>
+
+                                                    <div class="grid gap-3 sm:grid-cols-2">
+                                                        <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                                            <span>Wage (₹/day) / రోజువారీ వేతనం</span>
+                                                            <input type="number" step="0.01" min="0" name="task_wage" value="500"
+                                                                   class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                                        </label>
+                                                        <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                                            <span>Workers needed / కావలసిన కార్మికులు</span>
+                                                            <input type="number" min="1" max="50" name="task_workers" value="2"
+                                                                   class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                                        </label>
+                                                    </div>
+
+                                                    <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                                        <span>Description / వివరణ</span>
+                                                        <textarea name="task_description" rows="3"
+                                                                  class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100"
+                                                                  placeholder="Share quick instructions for workers or additional context for the farm."></textarea>
+                                                    </label>
+
+                                                    <button type="submit"
+                                                            class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
+                                                        <span class="material-symbols-outlined !text-base text-white">check_circle</span>
+                                                        <span>Accept & Post Task / అంగీకరించి పని పోస్ట్ చేయండి</span>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="/volunteer" class="inline-flex">
+                                                    <input type="hidden" name="action" value="decline_request">
+                                                    <input type="hidden" name="request_id" value="{{ req.id }}">
+                                                    <button type="submit"
+                                                            class="inline-flex items-center gap-2 rounded-xl border border-red-400 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400/60 dark:text-red-200 dark:hover:bg-red-500/10">
+                                                        <span class="material-symbols-outlined !text-base">close</span>
+                                                        <span>Decline / తిరస్కరించండి</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="mt-4 grid gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-gray-600 dark:text-gray-300">
+                                            <p><strong class="text-primary">Phone / ఫోన్:</strong> {{ req.worker_details.phone }}</p>
+                                            <p><strong class="text-primary">Village / గ్రామం:</strong> {{ req.worker_details.village|capitalize }}</p>
+                                            {% if req.worker_details.notes %}
+                                                <p><strong class="text-primary">Notes / గమనికలు:</strong> {{ req.worker_details.notes }}</p>
+                                            {% endif %}
+                                            {% if req.task_details %}
+                                                <p><strong class="text-primary">Task / పని:</strong> {{ req.task_details.task_name or 'Not specified' }}</p>
+                                                <p><strong class="text-primary">Location / స్థలం:</strong> {{ req.task_details.task_location or 'Not specified' }}</p>
+                                            {% endif %}
+                                            <div class="flex flex-wrap gap-3 pt-2">
+                                                <form method="POST" action="/volunteer">
+                                                    <input type="hidden" name="action" value="accept_request">
+                                                    <input type="hidden" name="request_id" value="{{ req.id }}">
+                                                     <button type="submit"
+                                                             class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
+                                                        <span class="material-symbols-outlined !text-base text-white">check_circle</span>
+                                                        <span>Accept / అంగీకరించండి</span>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="/volunteer">
+                                                    <input type="hidden" name="action" value="decline_request">
+                                                    <input type="hidden" name="request_id" value="{{ req.id }}">
+                                                     <button type="submit"
+                                                             class="inline-flex items-center gap-2 rounded-xl border border-red-400 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400/60 dark:text-red-200 dark:hover:bg-red-500/10">
+                                                        <span class="material-symbols-outlined !text-base">close</span>
+                                                        <span>Decline / తిరస్కరించండి</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-gray-500 shadow dark:border-primary/40 dark:bg-gray-900 dark:text-gray-300">
+                            No pending requests right now. Workers and farmers will appear here as soon as they reach out. / ప్రస్తుతం పెండింగ్ అభ్యర్థనలు లేవు. కార్మికులు మరియు రైతులు సంప్రదించగానే ఇక్కడ కనిపిస్తారు.
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Post a Task for Workers / కార్మికుల కోసం పని పోస్ట్ చేయండి</h2>
+                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Manual posting / చేతివేసి ప్రచురణ</span>
+                    </div>
+                    <article class="rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
+                        <form method="POST" action="/volunteer" class="grid gap-3">
+                            <input type="hidden" name="action" value="create_task">
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                    <span>Village / గ్రామం</span>
+                                    <select name="village" class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                        <option value="">Select village / గ్రామాన్ని ఎంచుకోండి</option>
+                                        {% for v in villages %}
+                                            <option value="{{ v }}">{{ v|capitalize }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                    <span>Task type / పనుల రకం</span>
+                                    <select name="task" class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                        <option value="">Select task / పనిని ఎంచుకోండి</option>
+                                        {% for task_option in tasks %}
+                                            <option value="{{ task_option }}">{{ task_option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="grid gap-3 sm:grid-cols-2">
+                                <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                    <span>Wage (₹/day) / రోజువారీ వేతనం</span>
+                                    <input type="number" step="0.01" min="0" name="wage"
+                                           class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                </label>
+                                <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                    <span>Workers needed / కావలసిన కార్మికులు</span>
+                                    <input type="number" min="1" max="50" name="num_workers" value="1"
+                                           class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
+                                </label>
+                            </div>
+                            <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
+                                <span>Description / వివరణ</span>
+                                <textarea name="description" rows="3"
+                                          class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100"
+                                          placeholder="Share any additional instructions or context for workers."></textarea>
+                            </label>
+                            <button type="submit"
+                                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
+                                <span class="material-symbols-outlined !text-base text-white">add_circle</span>
+                                <span>Create Task / పని సృష్టించండి</span>
+                            </button>
+                        </form>
+                    </article>
+                </section>
+
+                <section class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Recent Tasks You Posted / మీరు పోస్ట్ చేసిన తాజా పనులు</h2>
+                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Latest {{ volunteer_tasks|length }} / తాజాగా {{ volunteer_tasks|length }}</span>
+                    </div>
+                    {% if volunteer_tasks %}
+                        <div class="grid gap-4 md:grid-cols-2">
+                            {% for task in volunteer_tasks %}
+                                <article class="rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
+                                    <header class="flex items-start justify-between">
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">{{ task.task }}</h3>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ task.village }}, {{ task.mandal }}</p>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                                            {{ task.status|default('open')|capitalize }} / {{ volunteer_status_labels.get(task.status|default('open'), '') }}
+                                        </span>
+                                    </header>
+                                    <dl class="mt-3 grid gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="material-symbols-outlined !text-base text-primary">currency_rupee</span>
+                                            <span>₹{{ task.wage }}/day · రోజుకు</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="material-symbols-outlined !text-base text-primary">group</span>
+                                            <span>{{ task.num_workers }} workers / కార్మికులు</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="material-symbols-outlined !text-base text-primary">schedule</span>
+                                            <span>{{ task.created_at | timestamp_to_datetime }}</span>
+                                        </div>
+                                    </dl>
+                                    {% if task.description %}
+                                        <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">{{ task.description }}</p>
+                                    {% endif %}
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-gray-500 shadow dark:border-primary/40 dark:bg-gray-900 dark:text-gray-300">
+                            Your posted tasks will appear here once you create them. / మీరు పనులు సృష్టించిన తర్వాత అవి ఇక్కడ కనిపిస్తాయి.
+                        </div>
+                    {% endif %}
+                </section>
+            </section>
+        </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/i18n.js"></script>
 </body>
 </html>

@@ -3,147 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmer Help - Welcome</title>
+    <title>Farmer – Volunteer Help</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1f5c23;
+            --accent: #f6c453;
+            --surface: #ffffff;
+            --text: #1c201c;
+            --text-muted: #566259;
+            --shadow-soft: 0 18px 40px rgba(28, 90, 40, 0.14);
+        }
+        * { box-sizing: border-box; }
         body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            margin: 0;
             min-height: 100vh;
+            background: linear-gradient(145deg, #f1f9f2 0%, #dff0e3 65%, #d3e8db 100%);
+            font-family: 'Inter', 'Noto Sans Telugu', 'Noto Sans Devanagari', system-ui, sans-serif;
+            color: var(--text);
         }
-        .container { max-width: 900px; margin-top: 70px; }
-        .card { border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .badge-rounded { border-radius: 20px; }
-        .table thead th { background:#2e7d32; color:#fff; }
-        .village-name { font-weight: 600; }
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.12);
+        }
+        .nav-inner {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-actions .btn {
+            font-size: 0.85rem;
+            border-radius: 999px;
+            padding: 6px 14px;
+        }
+        main { flex: 1; }
+        .content-wrap {
+            max-width: 1080px;
+            margin: 32px auto 44px;
+            padding: 0 24px;
+            display: grid;
+            gap: 24px;
+        }
+        .hero-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 26px;
+            box-shadow: var(--shadow-soft);
+            display: grid;
+            gap: 12px;
+        }
+        .hero-card h1 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            color: var(--primary-dark);
+        }
+        .hero-card p {
+            margin: 6px 0 0;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .badge-soft {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(46, 125, 50, 0.14);
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .info-banner {
+            background: linear-gradient(115deg, rgba(46, 125, 50, 0.18), rgba(246, 196, 83, 0.22));
+            border-radius: 20px;
+            padding: 22px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            box-shadow: 0 16px 36px rgba(46, 125, 50, 0.14);
+        }
+        .info-banner h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+        }
+        .info-banner p {
+            margin: 6px 0 0;
+            color: var(--text-muted);
+        }
+        .volunteer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+        }
+        .vol-card {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid rgba(46, 125, 50, 0.12);
+            box-shadow: 0 12px 28px rgba(28, 90, 40, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .vol-card h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-dark);
+        }
+        .vol-card p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+        .vol-card small {
+            color: var(--text-muted);
+        }
+        .vol-card .btn {
+            margin-top: auto;
+            border-radius: 14px;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            border-radius: 18px;
+            background: rgba(46, 125, 50, 0.08);
+            padding: 20px;
+            color: var(--primary-dark);
+        }
+        .alert-custom {
+            border-radius: 16px;
+            padding: 16px;
+            border: none;
+        }
+        @media (max-width: 576px) {
+            .nav-inner { padding: 12px 16px; }
+            .content-wrap { padding: 0 16px; }
+            .info-banner { padding: 18px; }
+        }
     </style>
-    <script>
-        function confirmSend(form) {
-            return confirm('Send help request to this volunteer?');
-        }
-    </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">Welcome</a>
-            <div class="ms-auto d-flex gap-2">
-                <a href="/farmer" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
-                <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+    <div class="page-shell">
+        <header class="top-nav">
+            <div class="nav-inner">
+                <a class="brand-link" href="/" data-i18n="hero.title">Welcome</a>
+                <div class="nav-actions">
+                    <a href="/farmer" class="btn btn-outline-secondary btn-sm" data-i18n="farmer.help_page.back">Back to dashboard</a>
+                    <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+                </div>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <div class="container">
-        <div class="card p-4">
-            <h3 class="text-success mb-3">Request Help From Volunteers</h3>
+        <main>
+            <div class="content-wrap">
+                <section class="hero-card">
+                    <span class="badge-soft" data-i18n="farmer.help_page.badge">Need volunteer guidance</span>
+                    <h1 data-i18n="farmer.help_page.title">Ask a volunteer to guide you</h1>
+                    <p data-i18n="farmer.help_page.subtitle">
+                        Volunteers can call you, explain the work clearly, and post a task on your behalf if needed. Pick someone from your village or a nearby village and send them a request.
+                    </p>
+                </section>
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show alert-custom" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle bg-white">
-                    <thead>
-                        <tr>
-                            <th scope="col">Village</th>
-                            <th scope="col">Volunteer Name</th>
-                            <th scope="col">Phone</th>
-                            <th scope="col" class="text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for v in villages %}
-                            {% set vol = volunteers_by_village.get(v) %}
-                            <tr>
-                                <td class="village-name">{{ v.capitalize() }}</td>
-                                <td>{{ vol.name if vol else '—' }}</td>
-                                <td>{{ vol.phone if vol else '—' }}</td>
-                                <td class="text-end">
+                <section class="info-banner">
+                    <div>
+                        <h2 data-i18n="farmer.help_page.tip_title">How volunteer help works</h2>
+                        <p data-i18n="farmer.help_page.tip_body">
+                            After you send a request, the volunteer will receive your phone number and village. They will call you, collect details gently, and make sure workers understand the task.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="/worker_help" class="btn btn-soft" data-i18n="farmer.help_page.link_worker">Help a worker get support</a>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <h2 data-i18n="farmer.help_page.section_title">Volunteers by village</h2>
+                        <p class="mb-0 small text-muted" data-i18n="farmer.help_page.section_subtitle">Pick whoever is closest to you. You can send more than one request if needed.</p>
+                    </div>
+                    {% if villages %}
+                        <div class="volunteer-grid">
+                            {% for v in villages %}
+                                {% set vol = volunteers_by_village.get(v) %}
+                                <div class="vol-card">
+                                    <h3>{{ v.capitalize() }}</h3>
                                     {% if vol %}
-                                        <form method="POST" action="/farmer_help" onsubmit="return confirmSend(this)" style="display:inline-block;">
+                                        <p><strong data-i18n="farmer.help_page.volunteer_name">Volunteer</strong>: {{ vol.name }}</p>
+                                        <p><strong data-i18n="contact.phone">Phone Number</strong>: {{ vol.phone }}</p>
+                                        <small data-i18n="farmer.help_page.volunteer_tip">They usually respond within a few minutes.</small>
+                                        <form method="POST" action="/farmer_help" class="mt-2">
                                             <input type="hidden" name="volunteer_id" value="{{ vol._id }}">
-                                            <button type="submit" class="btn btn-success btn-sm">Send Request</button>
+                                            <button type="submit" class="btn btn-primary btn-sm" data-i18n="farmer.help_page.button_request">Send request</button>
                                         </form>
                                     {% else %}
-                                        <span class="badge bg-secondary badge-rounded">No volunteer</span>
+                                        <p class="text-muted" data-i18n="farmer.help_page.no_volunteer">No volunteer listed for this village yet.</p>
+                                        <small data-i18n="farmer.help_page.no_volunteer_tip">Choose a volunteer from a nearby village.</small>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state" data-i18n="farmer.help_page.empty">Volunteers are being onboarded. Please check again shortly.</div>
+                    {% endif %}
+                </section>
             </div>
-        </div>
+        </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Help from Volunteer - Welcome</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-        }
-        .container {
-            max-width: 600px;
-            margin-top: 50px;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .btn-success {
-            background-color: #2e7d32;
-            border-color: #2e7d32;
-        }
-        .btn-success:hover {
-            background-color: #1b5e20;
-            border-color: #1b5e20;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2 class="text-success mb-4">Select a Volunteer for Help</h2>
-       
-        <div class="card p-4">
-            <ul class="list-group">
-                {% for village, volunteer in volunteers_by_village.items() %}
-                    <li class="list-group-item">
-                        <strong>Village: {{ village|capitalize }}</strong><br>
-                        Name: {{ volunteer.name }}<br>
-                        Phone: {{ volunteer.phone }}<br>
-                        <form method="POST" action="/farmer_help">
-                            <input type="hidden" name="volunteer_id" value="{{ volunteer._id }}">
-                            <button type="submit" class="btn btn-success mt-2">Send Request to this Volunteer</button>
-                        </form>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

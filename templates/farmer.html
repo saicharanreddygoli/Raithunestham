@@ -1,224 +1,404 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="{{ lang }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmer Dashboard - welcome</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{{ labels.title }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#62d411",
+                        "primary-dark": "#4c9f0d",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#182210",
+                        "text-primary": "#131b0d",
+                        "text-secondary": "#6c9a4c"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "Noto Sans Telugu", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
     <style>
-        body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            margin-top: 50px;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .btn-success {
-            background-color: #2e7d32;
-            border-color: #2e7d32;
-        }
-        .btn-success:hover {
-            background-color: #1b5e20;
-            border-color: #1b5e20;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .alert-warning {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/" data-i18n="hero.title">Welcome</a>
-            <div class="d-flex align-items-center ms-auto gap-2">
-                <span class="small text-muted" data-i18n="nav.language">Language</span>
-                <button class="btn btn-light btn-sm" onclick="switchLanguage('en')">EN</button>
-                <button class="btn btn-light btn-sm" onclick="switchLanguage('te')">TE</button>
-                <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-primary dark:text-white">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <header class="sticky top-0 z-20 flex items-center justify-between border-b border-gray-200 bg-background-light/95 px-4 py-3 backdrop-blur dark:border-gray-800 dark:bg-background-dark/90">
+            <div class="flex items-center gap-4">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
+                    <span class="material-symbols-outlined text-2xl">grass</span>
+                </div>
+                <div>
+                    <p class="text-xs uppercase tracking-[0.3em] text-text-secondary dark:text-gray-400">{{ labels.header_welcome }}</p>
+                    <h1 class="text-lg font-semibold leading-tight">{{ farmer.name }}</h1>
+                </div>
             </div>
-        </div>
-    </nav>
-    <div class="container">
-        <h2 class="text-success mb-4">👨‍🌾 <span data-i18n="farmer.dashboard.welcome">Farmer Dashboard</span> - {{ farmer.name }}</h2>
-       
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="flex items-center gap-3">
+                <div class="hidden text-sm font-medium text-text-secondary dark:text-gray-300 sm:flex sm:flex-col sm:items-end">
+                    <span>{{ farmer.village|capitalize }}</span>
+                    <span>{{ farmer.phone }}</span>
+                </div>
+                <form action="/logout" method="get">
+                    <button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary transition hover:bg-primary hover:text-white" type="submit" title="{{ labels.logout }}">
+                        <span class="material-symbols-outlined">logout</span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main class="flex-1 pb-24">
+            <section class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message_text in messages %}
+                            <div class="rounded-xl border border-primary/20 bg-white/80 p-4 text-sm text-text-primary shadow-md shadow-primary/10 dark:bg-white/5">
+                                <div class="flex items-start gap-3">
+                                    <span class="material-symbols-outlined text-primary">info</span>
+                                    <div>
+                                        <p class="font-semibold text-primary">{{ labels.flash_levels.get(category, labels.flash_default) }}</p>
+                                        <p class="mt-1 text-text-primary dark:text-gray-200">{{ message_text }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% if message %}
+                    <div class="rounded-xl border border-primary/20 bg-white/80 p-4 text-sm text-text-primary shadow-md shadow-primary/10 dark:bg-white/5">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary">info</span>
+                            <div>
+                                <p class="font-semibold text-primary">{{ labels.flash_levels.get(message_type, labels.flash_default) }}</p>
+                                <p class="mt-1 text-text-primary dark:text-gray-200">{{ message }}</p>
+                            </div>
+                        </div>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-       
-        {% if message %}
-            <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endif %}
-        <div class="card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 data-i18n="farmer.post_task">Post a New Task</h4>
-                <a href="/farmer_help" class="btn btn-outline-primary btn-sm" data-i18n="nav.request_help">Request Help from Volunteers</a>
-            </div>
-            <form method="POST" action="/farmer">
-                <div class="mb-3">
-                    <label for="mandal" class="form-label" data-i18n="label.mandal">Mandal</label>
-                    <select class="form-select" id="mandal" name="mandal" required>
-                        <option value="" data-i18n="form.select_mandal_placeholder">Select Mandal</option>
-                        <option value="gudlavalleru" selected>Gudlavalleru</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="village" class="form-label" data-i18n="vol.form.village">Village</label>
-                    <select class="form-select" id="village" name="village" required>
-                        <option value="" data-i18n="reg.farmer.village">Select Village</option>
-                        {% for v in villages %}
-                            <option value="{{ v }}">{{ v.capitalize() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="task" class="form-label" data-i18n="vol.form.task">Task</label>
-                    <select class="form-select" id="task" name="task" required>
-                        <option value="" data-i18n="form.select_task_placeholder">Select Task</option>
-                        {% for task in tasks %}
-                            <option value="{{ task }}">{{ task }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="wage" class="form-label" data-i18n="vol.form.wage">Wage per day (₹)</label>
-                    <input type="number" class="form-control" id="wage" name="wage" min="0" step="0.01">
-                </div>
-                <div class="mb-3">
-                    <label for="num_workers" class="form-label" data-i18n="vol.form.num_workers">Number of Workers Required</label>
-                    <input type="number" class="form-control" id="num_workers" name="num_workers" min="1" max="50" value="1">
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label" data-i18n="vol.form.description">Description (Optional)</label>
-                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success w-100" data-i18n="vol.form.submit">Post Task</button>
-            </form>
-        </div>
+                {% endif %}
 
-        {% if my_open_tasks %}
-        <div class="card p-4 mt-4">
-            <h4 data-i18n="farmer.assign_task_to_worker">Assign Task to a Worker</h4>
-            <form method="POST" action="/assign_task">
-                <div class="mb-3">
-                    <label for="task_id" class="form-label" data-i18n="farmer.select_your_task">Select Your Task</label>
-                    <select class="form-select" id="task_id" name="task_id" required>
-                        <option value="" data-i18n="form.select_task_placeholder">Select Task</option>
-                        {% for t in my_open_tasks %}
-                            <option value="{{ t._id }}">{{ t.task }} - {{ t.location }} (Needed: {{ t.num_workers }})</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="worker_phone" class="form-label" data-i18n="farmer.worker_phone_number">Worker Phone Number</label>
-                    <input type="text" class="form-control" id="worker_phone" name="worker_phone" data-i18n-placeholder="contact.enter_worker_phone" placeholder="Enter worker phone" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100" data-i18n="farmer.assign_task_button">Assign Task</button>
-            </form>
-            <small class="text-muted d-block mt-2" data-i18n="farmer.assigned_tasks_info">Assigned tasks will only be visible to that worker in their dashboard.</small>
-        </div>
-        {% endif %}
+                <div class="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+                    <section class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
+                        <header class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.post_kicker }}</p>
+                                <h2 class="text-2xl font-bold">{{ labels.post_title }}</h2>
+                            </div>
+                            <button id="toggleTaskForm" data-label-hide="{{ labels.post_hide_button }}" data-label-new="{{ labels.post_new_button }}" class="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-background-dark shadow hover:bg-primary-dark dark:text-black" type="button">
+                                <span class="material-symbols-outlined text-base">add_circle</span>
+                                <span class="label">{{ labels.post_new_button }}</span>
+                            </button>
+                        </header>
+                        <p class="text-sm text-text-secondary">
+                            {{ labels.post_help_text }}
+                        </p>
+                        <form id="taskForm" method="POST" action="/farmer" class="grid gap-4 rounded-2xl border border-primary/15 bg-primary/5 p-4" style="display: none;">
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="space-y-2 text-sm font-medium text-text-primary">
+                                    <span>{{ labels.form_mandal }}</span>
+                                    <select class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" id="mandal" name="mandal" required>
+                                        <option value="">{{ labels.form_select_mandal }}</option>
+                                        <option value="gudlavalleru" selected>Gudlavalleru</option>
+                                    </select>
+                                </label>
+                                <label class="space-y-2 text-sm font-medium text-text-primary">
+                                    <span>{{ labels.form_village }}</span>
+                                    <select class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" id="village" name="village" required>
+                                        <option value="">{{ labels.form_select_village }}</option>
+                                        {% for v in villages %}
+                                            <option value="{{ v }}">{{ v|capitalize }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="space-y-2 text-sm font-medium text-text-primary">
+                                    <span>{{ labels.form_task }}</span>
+                                    <select class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" id="task" name="task" required>
+                                        <option value="">{{ labels.form_select_task }}</option>
+                                        {% for task in tasks %}
+                                            <option value="{{ task }}">{{ task }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label class="space-y-2 text-sm font-medium text-text-primary">
+                                    <span>{{ labels.form_num_workers }}</span>
+                                    <input class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" id="num_workers" min="1" max="50" name="num_workers" type="number" value="1" required>
+                                </label>
+                            </div>
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="space-y-2 text-sm font-medium text-text-primary">
+                                    <span>{{ labels.form_wage }}</span>
+                                    <input class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" id="wage" min="0" name="wage" step="0.01" type="number">
+                                </label>
+                                <label class="space-y-2 text-sm font-medium text-text-primary">
+                                    <span>{{ labels.form_description }}</span>
+                                    <textarea class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary" id="description" name="description" rows="3" placeholder="{{ labels.form_description_placeholder }}"></textarea>
+                                </label>
+                            </div>
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="text-xs text-text-secondary">
+                                    {{ labels.form_help_hint }} <a class="font-semibold text-primary hover:underline" href="/farmer_help">{{ labels.link_request_help }}</a>
+                                </div>
+                                <button class="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-sm font-semibold text-background-dark shadow transition hover:bg-primary-dark dark:text-black" type="submit">
+                                    <span class="material-symbols-outlined mr-1 text-base">send</span>
+                                    <span>{{ labels.form_submit }}</span>
+                                </button>
+                            </div>
+                        </form>
+                    </section>
 
-        <div class="card p-4 mt-4">
-            <h4 data-i18n="farmer.notifications">Notifications</h4>
-            <form method="POST" action="/farmer" class="mb-3">
-                <input type="hidden" name="action" value="fetch_notifications">
-                <button type="submit" class="btn btn-outline-primary" data-i18n="farmer.check_notifications">Check Notifications</button>
-            </form>
-            {% if notifications %}
-                <div class="alert alert-info">
-                    <h6>Recent Notifications:</h6>
-                    <ul class="mb-0">
-                        {% for notification in notifications %}
-                            <li>
-                                <strong>{{ notification.message }}</strong><br>
-                                <small class="text-muted">
-                                    Worker: {{ notification.worker_name }} 
-                                    {% if notification.worker_phone %} (Phone: {{ notification.worker_phone }}){% endif %}<br>
-                                    Location: {{ notification.task_location }}<br>
-                                    Time: {{ notification.created_at | timestamp_to_datetime }}
-                                </small>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    <aside class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.summary_kicker }}</p>
+                            <h2 class="text-xl font-semibold">{{ labels.summary_title }}</h2>
+                        </div>
+                        <dl class="grid gap-3 text-sm">
+                            <div class="flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
+                                <dt class="font-medium text-text-secondary">{{ labels.summary_village }}</dt>
+                                <dd class="font-semibold text-text-primary dark:text-white">{{ farmer.village|capitalize }}</dd>
+                            </div>
+                            <div class="flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
+                                <dt class="font-medium text-text-secondary">{{ labels.summary_phone }}</dt>
+                                <dd class="font-semibold text-text-primary dark:text-white">{{ farmer.phone }}</dd>
+                            </div>
+                        </dl>
+                        <div class="grid gap-3">
+                            <a class="flex items-center justify-between rounded-xl border border-primary/20 px-3 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10" href="/farmer_help">
+                                <span class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-base">volunteer_activism</span>
+                                    {{ labels.link_request_help }}
+                                </span>
+                                <span class="material-symbols-outlined text-sm">chevron_right</span>
+                            </a>
+                            <a class="flex items-center justify-between rounded-xl border border-primary/20 px-3 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10" href="/worker_help">
+                                <span class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-base">diversity_3</span>
+                                    {{ labels.link_guide_worker }}
+                                </span>
+                                <span class="material-symbols-outlined text-sm">chevron_right</span>
+                            </a>
+                        </div>
+                        {% if my_open_tasks %}
+                            <div class="space-y-2">
+                                <h3 class="text-sm font-semibold uppercase tracking-[0.3em] text-text-secondary/80">{{ labels.open_tasks }}</h3>
+                                <ul class="space-y-2 text-sm">
+                                    {% for t in my_open_tasks[:4] %}
+                                        <li class="rounded-xl border border-primary/15 bg-primary/5 p-3">
+                                            <p class="font-semibold text-text-primary dark:text-white">{{ t.task }}</p>
+                                            <p class="text-xs text-text-secondary">{{ t.location }}</p>
+                                            <p class="mt-1 text-xs text-text-secondary">
+                                                {{ t.num_workers }} {{ labels.active_workers_label }} • ₹{{ t.wage }} {{ labels.wage_suffix }}<br>
+                                                {{ t.created_at | timestamp_to_datetime }}
+                                            </p>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </aside>
                 </div>
-            {% endif %}
-        </div>
 
-        <div class="card p-4 mt-4">
-            <h4>Help Request Status</h4>
-            <form method="POST" action="/farmer" class="mb-3">
-                <input type="hidden" name="action" value="fetch_help_status">
-                <button type="submit" class="btn btn-outline-primary">Check Help Request Status</button>
-            </form>
-            {% if accepted_overview %}
-                <ul class="list-group">
-                    {% for t in accepted_overview %}
-                        <li class="list-group-item">
-                            <strong>Help Request Status:</strong> {{ t.status|title }}<br>
-                            <strong>Volunteer:</strong> {{ t.volunteer_name }}<br>
-                            <strong>Task:</strong> {{ t.task }} at {{ t.location }} (Required: {{ t.num_workers }})<br>
-                            {% if t.accepted and t.accepted|length > 0 %}
-                                <div class="mt-2">
-                                    <div class="alert alert-success">
-                                        <strong>✅ Your help request is accepted by workers:</strong>
-                                        <ul class="mb-0 mt-1">
-                                            {% for w in t.accepted %}
-                                                <li>
-                                                    <strong>{{ w.name }}</strong>
-                                                    {% if w.village %} from {{ w.village|capitalize }}{% endif %}
-                                                    {% if w.phone %} (Phone: {{ w.phone }}){% endif %}
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                        <div class="mt-2">
-                                            <small class="text-muted">
-                                                <strong>Contact Information:</strong> You can now contact these workers directly or through the volunteer {{ t.volunteer_name }} for assistance.
-                                            </small>
+                <section class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
+                    <header class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.active_kicker }}</p>
+                            <h2 class="text-xl font-semibold">{{ labels.active_title }}</h2>
+                        </div>
+                    </header>
+                    {% if my_open_tasks %}
+                        <div class="grid gap-4 md:grid-cols-2">
+                            {% for task in my_open_tasks %}
+                                <article class="flex flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm shadow-primary/5 transition hover:-translate-y-1 hover:shadow-lg dark:bg-white/5">
+                                    <div class="space-y-4 p-5">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div>
+                                                <h3 class="text-lg font-semibold text-text-primary dark:text-white">{{ task.task }}</h3>
+                                                <p class="text-sm text-text-secondary">{{ task.location }}</p>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary">
+                                                <span class="inline-block h-2 w-2 rounded-full bg-primary"></span>
+                                                {{ status_labels.get(task.status or 'open', (task.status or 'open')|title) }}
+                                            </span>
+                                        </div>
+                                        <div class="space-y-3 text-sm text-text-secondary">
+                                            <div class="flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-xl text-text-secondary">group</span>
+                                                <span class="font-semibold text-text-primary dark:text-white">{{ task.accepted_workers|length }}/{{ task.num_workers }}</span>
+                                                <span>{{ labels.active_workers_label }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-xl text-text-secondary">payments</span>
+                                                <span class="font-semibold text-text-primary dark:text-white">₹{{ task.wage }} {{ labels.wage_suffix }}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            {% else %}
-                                <div class="mt-2">
-                                    <div class="alert alert-info">
-                                        <em>⏳ No workers accepted yet. Your help request is still open for workers to accept.</em>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center text-sm text-text-secondary">
+                            {{ labels.active_empty }}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
+                    <header class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.notifications_kicker }}</p>
+                            <h2 class="text-xl font-semibold">{{ labels.notifications_title }}</h2>
+                        </div>
+                        <form method="POST" action="/farmer">
+                            <input type="hidden" name="action" value="fetch_notifications">
+                            <button class="flex items-center gap-2 rounded-full border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white" type="submit">
+                                <span class="material-symbols-outlined text-sm">refresh</span>
+                                {{ labels.refresh_button }}
+                            </button>
+                        </form>
+                    </header>
+                    {% if notifications %}
+                        <ul class="space-y-3 text-sm">
+                            {% for notification in notifications %}
+                                <li class="rounded-xl border border-primary/15 bg-primary/5 p-4">
+                                    <p class="font-semibold text-text-primary dark:text-white">{{ notification.message }}</p>
+                                    <dl class="mt-2 grid gap-1 text-xs text-text-secondary">
+                                        <div class="flex justify-between">
+                                            <span>{{ labels.notification_location }}</span>
+                                            <span>{{ notification.task_location }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>{{ labels.notification_worker_phone }}</span>
+                                            <span>{{ notification.worker_phone or labels.notification_phone_missing }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>{{ labels.notification_when }}</span>
+                                            <span>{{ notification.created_at | timestamp_to_datetime }}</span>
+                                        </div>
+                                    </dl>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center text-sm text-text-secondary">
+                            {{ labels.notifications_empty }}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
+                    <header class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.help_kicker }}</p>
+                            <h2 class="text-xl font-semibold">{{ labels.help_title }}</h2>
+                        </div>
+                        <form method="POST" action="/farmer">
+                            <input type="hidden" name="action" value="fetch_help_status">
+                            <button class="flex items-center gap-2 rounded-full border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white" type="submit">
+                                <span class="material-symbols-outlined text-sm">refresh</span>
+                                {{ labels.refresh_button }}
+                            </button>
+                        </form>
+                    </header>
+                    {% if accepted_overview %}
+                        <ul class="space-y-3">
+                            {% for item in accepted_overview %}
+                                <li class="rounded-2xl border border-primary/15 bg-primary/5 p-4">
+                                    <div class="flex flex-wrap items-start justify-between gap-3">
+                                        <div>
+                                            <p class="text-lg font-semibold text-text-primary dark:text-white">{{ item.task }}</p>
+                                            <p class="text-sm text-text-secondary">{{ item.location }}</p>
+                                        </div>
+                                        <div class="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary dark:bg-white/10">
+                                            {{ status_labels.get(item.status or 'open', (item.status or 'open')|title) }}
+                                        </div>
                                     </div>
-                                </div>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
+                                    <p class="mt-3 text-sm text-text-secondary">
+                                        {{ labels.help_volunteer }} <span class="font-medium text-text-primary dark:text-white">{{ item.volunteer_name }}</span> • {{ labels.help_workers_needed }} {{ item.num_workers }}
+                                    </p>
+                                    {% if item.accepted and item.accepted|length > 0 %}
+                                        <div class="mt-3 rounded-xl border border-primary/20 bg-white/80 p-3 text-sm text-text-primary shadow-sm dark:bg-white/10">
+                                            <p class="font-semibold text-primary">{{ labels.help_accepted_header }}</p>
+                                            <ul class="mt-2 grid gap-1 text-xs text-text-secondary">
+                                                {% for worker in item.accepted %}
+                                                    <li>
+                                                        <strong class="text-text-primary dark:text-white">{{ worker.name }}</strong>
+                                                        {% if worker.village %} • {{ worker.village|capitalize }}{% endif %}
+                                                        {% if worker.phone %} • {{ worker.phone }}{% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                            <p class="mt-2 text-xs text-text-secondary">
+                                                {{ labels.help_contact_hint }}
+                                            </p>
+                                        </div>
+                                    {% else %}
+                                        <div class="mt-3 rounded-xl border border-primary/20 bg-white/60 p-3 text-sm text-text-secondary dark:bg-white/10">
+                                            {{ labels.help_no_workers }}
+                                        </div>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center text-sm text-text-secondary">
+                            {{ labels.help_empty }}
+                        </div>
+                    {% endif %}
+                </section>
+            </section>
+        </main>
+
+        <footer class="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-200 bg-background-light/95 backdrop-blur dark:border-gray-700 dark:bg-background-dark/90">
+            <nav class="mx-auto flex w-full max-w-4xl justify-around px-6 py-2 text-xs font-medium uppercase tracking-[0.25em] text-text-secondary dark:text-gray-400">
+                <a class="flex flex-col items-center gap-1 text-primary" href="#">
+                    <span class="material-symbols-outlined text-2xl">home</span>
+                    <span class="text-[10px]">{{ labels.footer_dashboard }}</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 transition hover:text-primary" href="/farmer_help">
+                    <span class="material-symbols-outlined text-2xl">chat_bubble</span>
+                    <span class="text-[10px]">{{ labels.footer_messages }}</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 transition hover:text-primary" href="/worker_help">
+                    <span class="material-symbols-outlined text-2xl">groups</span>
+                    <span class="text-[10px]">{{ labels.footer_workers }}</span>
+                </a>
+                <a class="flex flex-col items-center gap-1 transition hover:text-primary" href="/logout">
+                    <span class="material-symbols-outlined text-2xl">person</span>
+                    <span class="text-[10px]">{{ labels.footer_profile }}</span>
+                </a>
+            </nav>
+        </footer>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/i18n.js"></script>
+
+    <script>
+        const toggleButton = document.getElementById('toggleTaskForm');
+        const taskForm = document.getElementById('taskForm');
+        if (toggleButton && taskForm) {
+            const labelSpan = toggleButton.querySelector('.label');
+            const newLabel = toggleButton.dataset.labelNew;
+            const hideLabel = toggleButton.dataset.labelHide;
+            toggleButton.addEventListener('click', () => {
+                const isHidden = taskForm.style.display === 'none' || taskForm.style.display === '';
+                taskForm.style.display = isHidden ? 'grid' : 'none';
+                labelSpan.textContent = isHidden ? hideLabel : newLabel;
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,91 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang or 'en' }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Login - Welcome</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{{ 'AgriConnect · Worker Login' if (lang or 'en') != 'te' else 'AgriConnect · కార్మికుల లాగిన్' }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4CAF50",
+                        "primary-dark": "#388E3C",
+                        accent: "#FFC107",
+                        backdrop: "#F3F5F2"
+                    },
+                    fontFamily: {
+                        display: ["Public Sans", "Noto Sans Telugu", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            color: #2e7d32 !important;
-        }
-        .card {
-            max-width: 400px;
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            margin: 20px;
-        }
-        .btn-success {
-            background-color: #2e7d32;
-            border-color: #2e7d32;
-        }
-        .btn-success:hover {
-            background-color: #1b5e20;
-            border-color: #1b5e20;
-        }
-        .login-card {
-            padding: 30px;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/" data-i18n="hero.title">Welcome</a>
-            <div class="ms-auto d-flex align-items-center gap-2">
-                <span class="small text-muted" data-i18n="nav.language">Language</span>
-                <button class="btn btn-light btn-sm" onclick="switchLanguage('en')">EN</button>
-                <button class="btn btn-light btn-sm" onclick="switchLanguage('te')">TE</button>
-                <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+<body class="min-h-screen bg-backdrop font-display text-[#2f2f2f]">
+    {% set is_te = (lang == 'te') %}
+    <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-backdrop to-white"></div>
+        <div class="relative z-10 w-full max-w-md space-y-6 rounded-3xl bg-white/95 p-8 shadow-2xl shadow-primary/10 backdrop-blur">
+            <div class="space-y-2 text-center">
+                <p class="text-xs uppercase tracking-[0.45em] text-primary">AgriConnect</p>
+                <h1 class="text-2xl font-bold text-[#2f2f2f]">{{ 'Worker Login' if not is_te else 'కార్మికుల లాగిన్' }}</h1>
+                <p class="text-sm text-gray-500">{{ 'Find nearby tasks, accept opportunities, and stay connected with volunteers.' if not is_te else 'సమీప పనులను కనుగొని, అవకాశాలను అంగీకరించి, సేవకులతో అనుసంధానంగా ఉండండి.' }}</p>
             </div>
-        </div>
-    </nav>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card login-card">
-                    <h2 class="text-center text-success mb-4" data-i18n="login.worker.title">👷 Worker Login</h2>
-                   
-                    {% if error %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ error }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        <div class="flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-[#2f2f2f]">
+                            <span class="material-symbols-outlined text-primary">info</span>
+                            <p>{{ msg }}</p>
                         </div>
-                    {% endif %}
-                    <form method="POST" action="/worker_login">
-                        <div class="mb-3">
-                            <label for="name" class="form-label" data-i18n="login.worker.name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" data-i18n-placeholder="login.worker.name" placeholder="Enter your name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label" data-i18n="login.worker.password">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" data-i18n-placeholder="login.worker.password" placeholder="Enter your password" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100" data-i18n="login.worker.button">Login</button>
-                    </form>
-                   
-                    <div class="mt-3 text-center">
-                        <p><span data-i18n="login.worker.signup">New worker?</span> <a href="/worker_reg" data-i18n="reg.worker.button">Register</a></p>
-                        <p><a href="/">← Back to Home</a></p>
-                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if error %}
+                <div class="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <span class="material-symbols-outlined">error_circle</span>
+                    <p>{{ error }}</p>
                 </div>
+            {% endif %}
+
+            <form method="POST" action="/worker_login" class="space-y-4">
+                <label class="grid gap-2 text-sm font-semibold text-[#3a3a3a]">
+                    <span>{{ 'Name' if not is_te else 'పేరు' }}</span>
+                    <input type="text" name="name" placeholder="{{ 'Enter your name' if not is_te else 'మీ పేరును నమోదు చేయండి' }}"
+                           required
+                           class="w-full rounded-2xl border border-primary/30 bg-white px-4 py-3 text-sm text-[#2f2f2f] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
+                </label>
+
+                <label class="grid gap-2 text-sm font-semibold text-[#3a3a3a]">
+                    <span>{{ 'Password' if not is_te else 'సంకేతపదం' }}</span>
+                    <input type="password" name="password" placeholder="{{ 'Enter your password' if not is_te else 'మీ సంకేతపదాన్ని నమోదు చేయండి' }}"
+                           required
+                           class="w-full rounded-2xl border border-primary/30 bg-white px-4 py-3 text-sm text-[#2f2f2f] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
+                </label>
+
+                <button type="submit"
+                        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark">
+                    {{ 'Login' if not is_te else 'లాగిన్ చేయండి' }}
+                </button>
+            </form>
+
+            <div class="text-center text-sm text-gray-600">
+                <p>{{ 'New worker?' if not is_te else 'కొత్త కార్మికుడా?' }}
+                    <a href="/worker_reg" class="font-semibold text-primary hover:underline">{{ 'Register' if not is_te else 'నమోదు' }}</a>
+                </p>
+                <p class="mt-2">
+                    <a href="/get-started" class="inline-flex items-center gap-1 text-primary hover:underline">
+                        <span aria-hidden="true">&larr;</span>
+                        <span>{{ 'Back to introduction' if not is_te else 'పరిచయానికి తిరుగు' }}</span>
+                    </a>
+                </p>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/i18n.js"></script>
 </body>
 </html>

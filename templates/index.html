@@ -1,122 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container {
-            max-width: 800px;
-            padding: 20px;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            background-color: white;
-        }
-        .card-header {
-            background-color: #2e7d32;
-            color: white;
-            border-radius: 15px 15px 0 0;
-            padding: 20px;
-            text-align: center;
-        }
-        .btn-primary {
-            background-color: #2e7d32;
-            border-color: #2e7d32;
-        }
-        .btn-primary:hover {
-            background-color: #1b5e20;
-            border-color: #1b5e20;
-        }
-        .btn-outline-primary {
-            border-color: #2e7d32;
-            color: #2e7d32;
-        }
-        .btn-outline-primary:hover {
-            background-color: #2e7d32;
-            color: white;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-        }
-        .role-section {
-            margin-bottom: 20px;
-        }
-        .alert {
-            margin-bottom: 20px;
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AgriLink - Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6A9C42",
+                        "background-light": "#F5F5DC",
+                        "background-dark": "#4A2E1F",
+                        "text-light": "#4A2E1F",
+                        "text-dark": "#F5F5DC",
+                        "secondary": "#FFD700"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header d-flex align-items-center">
-                <div>
-                    <h1 data-i18n="hero.title">Welcome</h1>
-                    <p class="mb-0" data-i18n="hero.subtitle">Connecting Farmers and Workers for Agricultural Needs</p>
-                </div>
-                <div class="ms-auto d-flex align-items-center gap-2">
-                    <span class="text-white-50 small me-2" data-i18n="nav.language">Language</span>
-                    <button class="btn btn-light btn-sm" onclick="switchLanguage('en')">EN</button>
-                    <button class="btn btn-light btn-sm" onclick="switchLanguage('te')">TE</button>
-                </div>
-            </div>
-            <div class="card-body">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-               
-                <div class="role-section">
-                    <h3 class="text-success mb-3" data-i18n="card.farmers.title">👨‍🌾 Farmer</h3>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="/farmer_reg" class="btn btn-primary" data-i18n="btn.register_farmer">Register as Farmer</a>
-                        <a href="/farmer_login" class="btn btn-outline-primary" data-i18n="btn.login_farmer">Login as Farmer</a>
-                    </div>
-                    <p class="text-muted text-center mt-2" data-i18n="card.farmers.desc">Post agricultural tasks and hire workers</p>
-                </div>
-               
-                <div class="role-section">
-                    <h3 class="text-success mb-3" data-i18n="card.workers.title">👷 Worker</h3>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="/worker_reg" class="btn btn-primary" data-i18n="btn.register_worker">Register as Worker</a>
-                        <a href="/worker_login" class="btn btn-outline-primary" data-i18n="btn.login_worker">Login as Worker</a>
-                    </div>
-                    <p class="text-muted text-center mt-2" data-i18n="card.workers.desc">Find and accept nearby farming jobs</p>
-                </div>
-               
-                <div class="role-section">
-                    <h3 class="text-success mb-3" data-i18n="card.volunteers.title">🤝 Volunteer</h3>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="/volunteer_reg" class="btn btn-primary" data-i18n="btn.register_volunteer">Register as Volunteer</a>
-                        <a href="/volunteer_login" class="btn btn-outline-primary" data-i18n="btn.login_volunteer">Login as Volunteer</a>
-                    </div>
-                    <p class="text-muted text-center mt-2" data-i18n="card.volunteers.desc">Assist with task management and community support</p>
-                </div>
-            </div>
-        </div>
+<style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+  </head>
+<body class="font-display">
+<div class="relative h-screen w-screen overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="h-full w-full bg-cover bg-center" style='background: linear-gradient(135deg, rgba(34,85,16,0.5), rgba(122,170,68,0.4)), url("{{ url_for('static', filename='landing_bg.jpg') }}") center/cover no-repeat;'></div>
+        <div class="absolute inset-0 bg-black/32"></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/i18n.js"></script>
-</body>
-</html>
+    <div class="relative z-10 flex h-full flex-col items-center justify-between px-6 py-12 text-white">
+        <div class="flex w-full max-w-5xl items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-3xl">grass</span>
+                <span class="text-lg font-bold tracking-[0.3em] uppercase">AgriLink</span>
+            </div>
+            <span class="text-sm uppercase tracking-[0.4em] text-white/70">Rural Labor Bridge</span>
+        </div>
+        <div class="flex flex-col items-center text-center">
+            <h1 class="text-4xl font-bold sm:text-5xl">Connecting Hands in the Field</h1>
+            <p class="mt-4 max-w-xl text-base text-white/80 sm:text-lg">Choose your language to begin. You can switch any time later.</p>
+        </div>
+        <div class="flex w-full max-w-sm flex-col gap-4">
+            <button class="flex h-14 items-center justify-center rounded-full bg-white/90 text-base font-semibold text-primary transition hover:bg-white" onclick="chooseLanguage('en', '{{ url_for('get_started') }}')">
+                <span class="material-symbols-outlined mr-2 text-xl text-primary">translate</span>
+                English
+            </button>
+            <button class="flex h-14 items-center justify-center rounded-full bg-white/90 text-base font-semibold text-primary transition hover:bg-white" onclick="chooseLanguage('te', '{{ url_for('get_started') }}')">
+                <span class="material-symbols-outlined mr-2 text-xl text-primary">g_translate</span>
+                తెలుగు
+            </button>
+        </div>
+        <div class="text-xs uppercase tracking-[0.3em] text-white/60">Built for Farmers • Workers • Volunteers</div>
+    </div>
+</div>
+<script>
+    function chooseLanguage(lang, baseUrl) {
+        const url = new URL(baseUrl, window.location.origin);
+        url.searchParams.set('lang', lang);
+        window.location.href = url.toString();
+    }
+</script>
+</body></html>
