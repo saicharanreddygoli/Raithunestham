@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard - welcome</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .btn-success {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+        }
+        .btn-success:hover {
+            background-color: #1b5e20;
+            border-color: #1b5e20;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/" data-i18n="hero.title">Welcome</a>
+            <div class="d-flex align-items-center ms-auto gap-2">
+                <span class="small text-muted" data-i18n="nav.language">Language</span>
+                <button class="btn btn-light btn-sm" onclick="switchLanguage('en')">EN</button>
+                <button class="btn btn-light btn-sm" onclick="switchLanguage('te')">TE</button>
+                <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h2 class="text-success mb-4">👨‍🌾 <span data-i18n="farmer.dashboard.welcome">Farmer Dashboard</span> - {{ farmer.name }}</h2>
+       
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+       
+        {% if message %}
+            <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 data-i18n="farmer.post_task">Post a New Task</h4>
+                <a href="/farmer_help" class="btn btn-outline-primary btn-sm" data-i18n="nav.request_help">Request Help from Volunteers</a>
+            </div>
+            <form method="POST" action="/farmer">
+                <div class="mb-3">
+                    <label for="mandal" class="form-label" data-i18n="label.mandal">Mandal</label>
+                    <select class="form-select" id="mandal" name="mandal" required>
+                        <option value="" data-i18n="form.select_mandal_placeholder">Select Mandal</option>
+                        <option value="gudlavalleru" selected>Gudlavalleru</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="village" class="form-label" data-i18n="vol.form.village">Village</label>
+                    <select class="form-select" id="village" name="village" required>
+                        <option value="" data-i18n="reg.farmer.village">Select Village</option>
+                        {% for v in villages %}
+                            <option value="{{ v }}">{{ v.capitalize() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="task" class="form-label" data-i18n="vol.form.task">Task</label>
+                    <select class="form-select" id="task" name="task" required>
+                        <option value="" data-i18n="form.select_task_placeholder">Select Task</option>
+                        {% for task in tasks %}
+                            <option value="{{ task }}">{{ task }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="wage" class="form-label" data-i18n="vol.form.wage">Wage per day (₹)</label>
+                    <input type="number" class="form-control" id="wage" name="wage" min="0" step="0.01">
+                </div>
+                <div class="mb-3">
+                    <label for="num_workers" class="form-label" data-i18n="vol.form.num_workers">Number of Workers Required</label>
+                    <input type="number" class="form-control" id="num_workers" name="num_workers" min="1" max="50" value="1">
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label" data-i18n="vol.form.description">Description (Optional)</label>
+                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100" data-i18n="vol.form.submit">Post Task</button>
+            </form>
+        </div>
+
+        {% if my_open_tasks %}
+        <div class="card p-4 mt-4">
+            <h4 data-i18n="farmer.assign_task_to_worker">Assign Task to a Worker</h4>
+            <form method="POST" action="/assign_task">
+                <div class="mb-3">
+                    <label for="task_id" class="form-label" data-i18n="farmer.select_your_task">Select Your Task</label>
+                    <select class="form-select" id="task_id" name="task_id" required>
+                        <option value="" data-i18n="form.select_task_placeholder">Select Task</option>
+                        {% for t in my_open_tasks %}
+                            <option value="{{ t._id }}">{{ t.task }} - {{ t.location }} (Needed: {{ t.num_workers }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="worker_phone" class="form-label" data-i18n="farmer.worker_phone_number">Worker Phone Number</label>
+                    <input type="text" class="form-control" id="worker_phone" name="worker_phone" data-i18n-placeholder="contact.enter_worker_phone" placeholder="Enter worker phone" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100" data-i18n="farmer.assign_task_button">Assign Task</button>
+            </form>
+            <small class="text-muted d-block mt-2" data-i18n="farmer.assigned_tasks_info">Assigned tasks will only be visible to that worker in their dashboard.</small>
+        </div>
+        {% endif %}
+
+        <div class="card p-4 mt-4">
+            <h4 data-i18n="farmer.notifications">Notifications</h4>
+            <form method="POST" action="/farmer" class="mb-3">
+                <input type="hidden" name="action" value="fetch_notifications">
+                <button type="submit" class="btn btn-outline-primary" data-i18n="farmer.check_notifications">Check Notifications</button>
+            </form>
+            {% if notifications %}
+                <div class="alert alert-info">
+                    <h6>Recent Notifications:</h6>
+                    <ul class="mb-0">
+                        {% for notification in notifications %}
+                            <li>
+                                <strong>{{ notification.message }}</strong><br>
+                                <small class="text-muted">
+                                    Worker: {{ notification.worker_name }} 
+                                    {% if notification.worker_phone %} (Phone: {{ notification.worker_phone }}){% endif %}<br>
+                                    Location: {{ notification.task_location }}<br>
+                                    Time: {{ notification.created_at | timestamp_to_datetime }}
+                                </small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card p-4 mt-4">
+            <h4>Help Request Status</h4>
+            <form method="POST" action="/farmer" class="mb-3">
+                <input type="hidden" name="action" value="fetch_help_status">
+                <button type="submit" class="btn btn-outline-primary">Check Help Request Status</button>
+            </form>
+            {% if accepted_overview %}
+                <ul class="list-group">
+                    {% for t in accepted_overview %}
+                        <li class="list-group-item">
+                            <strong>Help Request Status:</strong> {{ t.status|title }}<br>
+                            <strong>Volunteer:</strong> {{ t.volunteer_name }}<br>
+                            <strong>Task:</strong> {{ t.task }} at {{ t.location }} (Required: {{ t.num_workers }})<br>
+                            {% if t.accepted and t.accepted|length > 0 %}
+                                <div class="mt-2">
+                                    <div class="alert alert-success">
+                                        <strong>✅ Your help request is accepted by workers:</strong>
+                                        <ul class="mb-0 mt-1">
+                                            {% for w in t.accepted %}
+                                                <li>
+                                                    <strong>{{ w.name }}</strong>
+                                                    {% if w.village %} from {{ w.village|capitalize }}{% endif %}
+                                                    {% if w.phone %} (Phone: {{ w.phone }}){% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <strong>Contact Information:</strong> You can now contact these workers directly or through the volunteer {{ t.volunteer_name }} for assistance.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="mt-2">
+                                    <div class="alert alert-info">
+                                        <em>⏳ No workers accepted yet. Your help request is still open for workers to accept.</em>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+</body>
+</html>

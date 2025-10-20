@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Login - Welcome</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #2e7d32 !important;
+        }
+        .card {
+            max-width: 400px;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+        .btn-success {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+        }
+        .btn-success:hover {
+            background-color: #1b5e20;
+            border-color: #1b5e20;
+        }
+        .btn-info {
+            background-color: #0288d1;
+            border-color: #0288d1;
+        }
+        .btn-info:hover {
+            background-color: #01579b;
+            border-color: #01579b;
+        }
+        .login-card {
+            padding: 30px;
+        }
+        .help-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .accepted-workers-section {
+            margin-top: 20px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-info {
+            background-color: #e7f3fe;
+            color: #31708f;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/" data-i18n="hero.title">Welcome</a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <span class="small text-muted" data-i18n="nav.language">Language</span>
+                <button class="btn btn-light btn-sm" onclick="switchLanguage('en')">EN</button>
+                <button class="btn btn-light btn-sm" onclick="switchLanguage('te')">TE</button>
+                <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card login-card">
+                    <h2 class="text-center text-success mb-4" data-i18n="login.farmer.title">👨‍🌾 Farmer Login</h2>
+                  
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                  
+                    {% if error %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    <form method="POST" action="/farmer_login">
+                        <div class="mb-3">
+                            <label for="name" class="form-label" data-i18n="login.farmer.name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" data-i18n-placeholder="login.farmer.name" placeholder="Enter your name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label" data-i18n="login.farmer.password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" data-i18n-placeholder="login.farmer.password" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100" data-i18n="login.farmer.button">Login</button>
+                    </form>
+                  
+                    <div class="mt-3 text-center">
+                        <p><span data-i18n="login.farmer.signup">New farmer?</span> <a href="/farmer_reg" data-i18n="reg.farmer.button">Register</a></p>
+                        <p><a href="/">← <span data-i18n="hero.title">Back to Home</span></a></p>
+                    </div>
+                  
+                    <div class="help-section">
+                        <a href="/farmer_help" class="btn btn-info w-100">Need Help from Volunteer</a>
+                    </div>
+
+                    {% if session.farmer_id %}
+                    <div class="accepted-workers-section">
+                        <h4>Accepted Workers</h4>
+                        <form method="POST" action="/farmer_login">
+                            <input type="hidden" name="action" value="fetch_accepted">
+                            <button type="submit" class="btn btn-outline-primary w-100">Fetch Accepted Workers For My Tasks</button>
+                        </form>
+                        {% if accepted_overview %}
+                            <ul class="list-group mt-3">
+                                {% for t in accepted_overview %}
+                                    <li class="list-group-item">
+                                        <strong>Task:</strong> {{ t.task }} at {{ t.location }} (Required: {{ t.num_workers }})<br>
+                                        {% if t.accepted and t.accepted|length > 0 %}
+                                            <div class="mt-2">
+                                                <div class="alert alert-success">
+                                                    <strong>✅ Your task is accepted by:</strong>
+                                                    <ul class="mb-0 mt-1">
+                                                        {% for w in t.accepted %}
+                                                            <li><strong>{{ w.name }}</strong>{% if w.village %} from {{ w.village|capitalize }}{% endif %}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mt-2">
+                                                <div class="alert alert-info">
+                                                    <em>⏳ No workers accepted yet. Your task is still open for workers to accept.</em>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard - Welcome</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            font-family: "Noto Sans Telugu", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .btn-success {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+        }
+        .btn-success:hover {
+            background-color: #1b5e20;
+            border-color: #1b5e20;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .task-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Welcome</a>
+            <div class="d-flex align-items-center ms-auto gap-2">
+                <div class="btn-group" role="group" aria-label="Language">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-i18n="nav.language" onclick="return false">Language</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="switchLanguage('en')">EN</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="switchLanguage('te')">TE</button>
+                </div>
+                <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h2 class="text-success mb-4">👷 <span data-i18n="worker.dashboard.title">Worker Dashboard</span> - {{ worker.name }}</h2>
+       
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+       
+        {% if message %}
+            <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+       
+        <div class="card p-4">
+            <h4 data-i18n="worker.fetch">Fetch Nearby Tasks</h4>
+            <form method="POST" action="/worker">
+                <input type="hidden" name="action" value="fetch_tasks">
+                <button type="submit" class="btn btn-success w-100" data-i18n="worker.fetch">Fetch Nearby Tasks</button>
+            </form>
+        </div>
+       
+        {% if nearby_tasks %}
+            <div class="card p-4 mt-4">
+                <h4 data-i18n="worker.nearby.title">Nearby Tasks</h4>
+                <div class="task-list">
+                    <ul class="list-group">
+                        {% for task in nearby_tasks %}
+                            <li class="list-group-item">
+                                <strong data-i18n="label.task">Task</strong>: {{ task.task }}<br>
+                                <strong data-i18n="label.location">Location</strong>: {{ task.location.capitalize() }}<br>
+                                <strong data-i18n="label.wage">Wage</strong>: ₹{{ task.wage }}/day<br>
+                                <strong data-i18n="label.workers_needed">Workers Needed</strong>: {{ task.num_workers }}<br>
+                                <strong data-i18n="label.distance">Distance</strong>: {{ task.distance_km }} km<br>
+                                <strong data-i18n="label.description">Description</strong>: {{ task.description or 'No description' }}<br>
+                                <form method="POST" action="/worker" style="display:inline;">
+                                    <input type="hidden" name="task_id" value="{{ task._id }}">
+                                    <button type="submit" class="btn btn-success btn-sm mt-2" name="action" value="accept" data-i18n="action.accept_task">Accept Task</button>
+                                </form>
+                                <form method="POST" action="/worker" style="display:inline;">
+                                    <input type="hidden" name="task_id" value="{{ task._id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm mt-2" name="action" value="deny" data-i18n="action.deny_task">Deny Task</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+       
+        {% if accepted_tasks %}
+            <div class="card p-4 mt-4">
+                <h4 data-i18n="worker.accepted.title">Accepted Tasks</h4>
+                <div class="task-list">
+                    <ul class="list-group">
+                        {% for task in accepted_tasks %}
+                            <li class="list-group-item">
+                                <strong data-i18n="label.task">Task</strong>: {{ task.task }}<br>
+                                <strong data-i18n="label.location">Location</strong>: {{ task.location.capitalize() }}<br>
+                                <strong data-i18n="label.wage">Wage</strong>: ₹{{ task.wage }}/day<br>
+                                <strong data-i18n="label.workers_needed">Workers Needed</strong>: {{ task.num_workers }}<br>
+                                <strong>Status:</strong> {{ 'Completed' if task.completed else 'In Progress' }}<br>
+                                <strong>Accepted By:</strong> {{ task.accepter_name }}<br>
+                                {% if not task.completed %}
+                                    <form method="POST" action="/worker" style="display:inline;">
+                                        <input type="hidden" name="task_id" value="{{ task._id }}">
+                                        <button type="submit" class="btn btn-success btn-sm mt-2" name="action" value="complete" data-i18n="action.complete">Mark as Complete</button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+</body>
+</html>
