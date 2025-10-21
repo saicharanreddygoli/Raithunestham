@@ -1,31 +1,41 @@
 <!DOCTYPE html>
-<html lang="{{ lang or 'en' }}">
+<html class="light" lang="{{ lang or 'en' }}">
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>{{ 'AgriConnect · Worker Login' if (lang or 'en') != 'te' else 'AgriConnect · కార్మికుల లాగిన్' }}</title>
+    <title>{{ 'Worker Login' if (lang or 'en') != 'te' else 'కార్మికుల లాగిన్' }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        primary: "#4CAF50",
-                        "primary-dark": "#388E3C",
-                        accent: "#FFC107",
-                        backdrop: "#F3F5F2"
+                        primary: "#2D572C",
+                        accent: "#D4A056",
+                        "background-light": "#F5F5F5",
+                        "background-dark": "#121212",
+                        "text-light": "#333333",
+                        "text-dark": "#E0E0E0",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1E1E1E",
+                        "border-light": "#E0E0E0",
+                        "border-dark": "#424242"
                     },
                     fontFamily: {
                         display: ["Public Sans", "Noto Sans Telugu", "sans-serif"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
                     }
                 }
             }
-        }
+        };
     </script>
     <style>
         .material-symbols-outlined {
@@ -33,68 +43,128 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-backdrop font-display text-[#2f2f2f]">
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
     {% set is_te = (lang == 'te') %}
-    <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-backdrop to-white"></div>
-        <div class="relative z-10 w-full max-w-md space-y-6 rounded-3xl bg-white/95 p-8 shadow-2xl shadow-primary/10 backdrop-blur">
-            <div class="space-y-2 text-center">
-                <p class="text-xs uppercase tracking-[0.45em] text-primary">AgriConnect</p>
-                <h1 class="text-2xl font-bold text-[#2f2f2f]">{{ 'Worker Login' if not is_te else 'కార్మికుల లాగిన్' }}</h1>
-                <p class="text-sm text-gray-500">{{ 'Find nearby tasks, accept opportunities, and stay connected with volunteers.' if not is_te else 'సమీప పనులను కనుగొని, అవకాశాలను అంగీకరించి, సేవకులతో అనుసంధానంగా ఉండండి.' }}</p>
-            </div>
-
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, msg in messages %}
-                        <div class="flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-[#2f2f2f]">
-                            <span class="material-symbols-outlined text-primary">info</span>
-                            <p>{{ msg }}</p>
+    <div class="relative flex min-h-screen w-full flex-col">
+        <div class="flex h-full min-h-screen grow flex-col">
+            <div class="flex flex-1">
+                <div class="flex w-full flex-col lg:flex-row">
+                    <div class="relative hidden flex-1 items-center justify-center bg-cover bg-center lg:flex">
+                        <div class="w-full h-full bg-center bg-no-repeat bg-cover flex flex-col justify-center items-center p-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCvOnm8987BPKex8O_U-Hh9FtaKi92HLWgTsqAmJq1JjGbPFXqQOIuaK1FZm9IPkx9tWHgzy_SkMJN-Ry_JmUwTOyaoXASkHR2ltWfzdjziS7lT9VOHWrhmBQ0Y9XRQvNhng3pw6SfVBA0d2C6kGTuDi6iI8YmaFnXQdWYGNoVFWhUdX4Loaqd-NZwwheCBEP8WeKvLhpkG99V7SXgrVqXMSMDKoFwtLYvZ0lasrfFz_YsL249OWg0RpS81XXt62dIalrI6E17l1RY");'>
+                            <div class="absolute inset-0 bg-primary/70"></div>
+                            <div class="relative z-10 flex flex-col items-center text-center text-white max-w-md">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <span class="material-symbols-outlined text-5xl">eco</span>
+                                </div>
+                                <p class="text-lg font-normal leading-normal text-white/90">
+                                    {{ 'Powering the future of farming.' if not is_te else 'వ్యవసాయ భవిష్యత్తును శక్తివంతం చేస్తోంది.' }}
+                                </p>
+                            </div>
                         </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+                    </div>
+                    <div class="flex w-full flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
+                        <div class="flex w-full max-w-md flex-col gap-8 py-10">
+                            <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
+                                <div class="flex items-center gap-2 mb-6 lg:hidden">
+                                    <span class="material-symbols-outlined text-3xl text-primary">eco</span>
+                                </div>
+                                <p class="text-3xl font-black leading-tight tracking-[-0.033em] text-text-light dark:text-text-dark">
+                                    {{ 'Sign in to your account' if not is_te else 'మీ ఖాతాలోకి ప్రవేశించండి' }}
+                                </p>
+                                <p class="text-base text-text-light/70 dark:text-text-dark/70 mt-2">
+                                    {{ 'Plan your day and respond to nearby farm tasks.' if not is_te else 'మీ రోజు ప్రణాళిక చేసి సమీప వ్యవసాయ పనులకు స్పందించండి.' }}
+                                </p>
+                            </div>
 
-            {% if error %}
-                <div class="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <span class="material-symbols-outlined">error_circle</span>
-                    <p>{{ error }}</p>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    <div class="flex flex-col gap-3">
+                                        {% for category, msg in messages %}
+                                            <div class="flex items-start gap-3 rounded-lg border border-border-light bg-card-light px-4 py-3 text-sm text-text-light shadow-sm dark:border-border-dark dark:bg-card-dark dark:text-text-dark">
+                                                <span class="material-symbols-outlined text-primary">info</span>
+                                                <p>{{ msg }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+
+                            {% if error %}
+                                <div class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200">
+                                    <span class="material-symbols-outlined">error</span>
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endif %}
+
+                            <form method="POST" action="/worker_login" class="flex flex-col gap-5">
+                                <label class="flex flex-col w-full">
+                                    <p class="text-base font-medium leading-normal pb-2">
+                                        {{ 'Name' if not is_te else 'పేరు' }}
+                                    </p>
+                                    <div class="relative">
+                                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-light/50 dark:text-text-dark/50">person</span>
+                                        <input name="name" required autocomplete="name"
+                                               class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-border-light bg-card-light dark:border-border-dark dark:bg-card-dark focus:border-primary focus:ring-2 focus:ring-primary/20 h-14 pl-11 pr-4 text-base font-normal leading-normal placeholder:text-text-light/50 dark:placeholder:text-text-dark/50"
+                                               placeholder="{{ 'Enter your name' if not is_te else 'మీ పేరును నమోదు చేయండి' }}"
+                                               value="{{ request.form.get('name', '') }}">
+                                    </div>
+                                </label>
+                                <label class="flex flex-col w-full">
+                                    <p class="text-base font-medium leading-normal pb-2">
+                                        {{ 'Password' if not is_te else 'సంకేతపదం' }}
+                                    </p>
+                                    <div class="relative">
+                                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-light/50 dark:text-text-dark/50">lock</span>
+                                        <input name="password" type="password" required autocomplete="current-password"
+                                               class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-border-light bg-card-light dark:border-border-dark dark:bg-card-dark focus:border-primary focus:ring-2 focus:ring-primary/20 h-14 pl-11 pr-11 text-base font-normal leading-normal placeholder:text-text-light/50 dark:placeholder:text-text-dark/50"
+                                               placeholder="{{ 'Enter your password' if not is_te else 'మీ సంకేతపదాన్ని నమోదు చేయండి' }}"
+                                               data-password-target="worker-login-password">
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-light/50 dark:text-text-dark/50 hover:text-text-light dark:hover:text-text-dark" data-password-toggle="worker-login-password">
+                                            <span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+                                        </button>
+                                    </div>
+                                </label>
+                                <button type="submit" class="flex items-center justify-center whitespace-nowrap rounded-lg bg-primary h-14 text-base font-bold text-white transition-all hover:bg-primary/90">
+                                    {{ 'Sign In' if not is_te else 'సైన్ ఇన్' }}
+                                </button>
+                            </form>
+                            <p class="text-center text-base font-normal leading-normal text-text-light/70 dark:text-text-dark/70">
+                                {{ 'New worker?' if not is_te else 'కొత్త కార్మికుడా?' }}
+                                <a class="font-bold text-primary hover:underline" href="/worker_reg">
+                                    {{ 'Create an account' if not is_te else 'ఖాతాను సృష్టించండి' }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
-
-            <form method="POST" action="/worker_login" class="space-y-4">
-                <label class="grid gap-2 text-sm font-semibold text-[#3a3a3a]">
-                    <span>{{ 'Name' if not is_te else 'పేరు' }}</span>
-                    <input type="text" name="name" placeholder="{{ 'Enter your name' if not is_te else 'మీ పేరును నమోదు చేయండి' }}"
-                           required
-                           class="w-full rounded-2xl border border-primary/30 bg-white px-4 py-3 text-sm text-[#2f2f2f] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
-                </label>
-
-                <label class="grid gap-2 text-sm font-semibold text-[#3a3a3a]">
-                    <span>{{ 'Password' if not is_te else 'సంకేతపదం' }}</span>
-                    <input type="password" name="password" placeholder="{{ 'Enter your password' if not is_te else 'మీ సంకేతపదాన్ని నమోదు చేయండి' }}"
-                           required
-                           class="w-full rounded-2xl border border-primary/30 bg-white px-4 py-3 text-sm text-[#2f2f2f] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30">
-                </label>
-
-                <button type="submit"
-                        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark">
-                    {{ 'Login' if not is_te else 'లాగిన్ చేయండి' }}
-                </button>
-            </form>
-
-            <div class="text-center text-sm text-gray-600">
-                <p>{{ 'New worker?' if not is_te else 'కొత్త కార్మికుడా?' }}
-                    <a href="/worker_reg" class="font-semibold text-primary hover:underline">{{ 'Register' if not is_te else 'నమోదు' }}</a>
-                </p>
-                <p class="mt-2">
-                    <a href="/get-started" class="inline-flex items-center gap-1 text-primary hover:underline">
-                        <span aria-hidden="true">&larr;</span>
-                        <span>{{ 'Back to introduction' if not is_te else 'పరిచయానికి తిరుగు' }}</span>
-                    </a>
-                </p>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggles = document.querySelectorAll('[data-password-toggle]');
+            toggles.forEach((toggle) => {
+                const targetName = toggle.getAttribute('data-password-toggle');
+                const input = document.querySelector(`[data-password-target="${targetName}"]`);
+                if (!input) {
+                    return;
+                }
+                toggle.addEventListener('click', () => {
+                    const icon = toggle.querySelector('.material-symbols-outlined');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        if (icon) {
+                            icon.textContent = 'visibility_off';
+                        }
+                    } else {
+                        input.type = 'password';
+                        if (icon) {
+                            icon.textContent = 'visibility';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

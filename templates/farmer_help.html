@@ -1,257 +1,186 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmer – Volunteer Help</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{{ translate('Volunteer Support for Farmers', 'రైతుల కోసం సేవకుల సహాయం') }}</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6A9C42',
+                        'primary-dark': '#4e7a31',
+                        surface: '#F7F8F5',
+                        'surface-dark': '#161a15',
+                        accent: '#F9C74F'
+                    },
+                    fontFamily: {
+                        display: ['Public Sans', 'Noto Sans Telugu', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
     <style>
-        :root {
-            --primary: #2e7d32;
-            --primary-dark: #1f5c23;
-            --accent: #f6c453;
-            --surface: #ffffff;
-            --text: #1c201c;
-            --text-muted: #566259;
-            --shadow-soft: 0 18px 40px rgba(28, 90, 40, 0.14);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: linear-gradient(145deg, #f1f9f2 0%, #dff0e3 65%, #d3e8db 100%);
-            font-family: 'Inter', 'Noto Sans Telugu', 'Noto Sans Devanagari', system-ui, sans-serif;
-            color: var(--text);
-        }
-        .page-shell {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .top-nav {
-            position: sticky;
-            top: 0;
-            z-index: 1040;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.8);
-            border-bottom: 1px solid rgba(46, 125, 50, 0.12);
-        }
-        .nav-inner {
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .brand-link {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--primary);
-            text-decoration: none;
-        }
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .nav-actions .btn {
-            font-size: 0.85rem;
-            border-radius: 999px;
-            padding: 6px 14px;
-        }
-        main { flex: 1; }
-        .content-wrap {
-            max-width: 1080px;
-            margin: 32px auto 44px;
-            padding: 0 24px;
-            display: grid;
-            gap: 24px;
-        }
-        .hero-card {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 26px;
-            box-shadow: var(--shadow-soft);
-            display: grid;
-            gap: 12px;
-        }
-        .hero-card h1 {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(1.8rem, 4vw, 2.2rem);
-            color: var(--primary-dark);
-        }
-        .hero-card p {
-            margin: 6px 0 0;
-            color: var(--text-muted);
-            line-height: 1.55;
-        }
-        .badge-soft {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: rgba(46, 125, 50, 0.14);
-            color: var(--primary-dark);
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        .info-banner {
-            background: linear-gradient(115deg, rgba(46, 125, 50, 0.18), rgba(246, 196, 83, 0.22));
-            border-radius: 20px;
-            padding: 22px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-items: center;
-            box-shadow: 0 16px 36px rgba(46, 125, 50, 0.14);
-        }
-        .info-banner h2 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--primary-dark);
-        }
-        .info-banner p {
-            margin: 6px 0 0;
-            color: var(--text-muted);
-        }
-        .volunteer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 18px;
-        }
-        .vol-card {
-            background: var(--surface);
-            border-radius: 18px;
-            padding: 18px;
-            border: 1px solid rgba(46, 125, 50, 0.12);
-            box-shadow: 0 12px 28px rgba(28, 90, 40, 0.08);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .vol-card h3 {
-            margin: 0;
-            font-size: 1.05rem;
-            font-family: 'Poppins', sans-serif;
-            color: var(--primary-dark);
-        }
-        .vol-card p {
-            margin: 0;
-            color: var(--text-muted);
-        }
-        .vol-card small {
-            color: var(--text-muted);
-        }
-        .vol-card .btn {
-            margin-top: auto;
-            border-radius: 14px;
-            font-weight: 600;
-        }
-        .empty-state {
-            text-align: center;
-            border-radius: 18px;
-            background: rgba(46, 125, 50, 0.08);
-            padding: 20px;
-            color: var(--primary-dark);
-        }
-        .alert-custom {
-            border-radius: 16px;
-            padding: 16px;
-            border: none;
-        }
-        @media (max-width: 576px) {
-            .nav-inner { padding: 12px 16px; }
-            .content-wrap { padding: 0 16px; }
-            .info-banner { padding: 18px; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 </head>
-<body>
-    <div class="page-shell">
-        <header class="top-nav">
-            <div class="nav-inner">
-                <a class="brand-link" href="/" data-i18n="hero.title">Welcome</a>
-                <div class="nav-actions">
-                    <a href="/farmer" class="btn btn-outline-secondary btn-sm" data-i18n="farmer.help_page.back">Back to dashboard</a>
-                    <a href="/logout" class="btn btn-outline-danger btn-sm" data-i18n="nav.logout">Logout</a>
+<body class="min-h-screen bg-surface font-display text-[#1f2715] dark:bg-surface-dark dark:text-gray-100">
+    <div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-16">
+        <header class="sticky top-0 z-30 -mx-4 mb-8 border-b border-primary/15 bg-surface/95 px-4 py-4 backdrop-blur dark:border-primary/30 dark:bg-surface-dark/85">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl text-primary">volunteer_activism</span>
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.35em] text-primary/80">{{ translate('Farmer Assistance', 'రైతుల సహాయం') }}</p>
+                        <h1 class="text-lg font-semibold">{{ translate('Connect with a volunteer', 'సేవకునితో కలవండి') }}</h1>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{{ url_for('farmer') }}" class="inline-flex items-center gap-2 rounded-full border border-primary px-3 py-1.5 text-sm font-semibold text-primary transition hover:bg-primary/10 dark:border-primary/60 dark:text-primary">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        <span>{{ translate('Back to dashboard', 'డ్యాష్‌బోర్డ్‌కు వెనుకకు') }}</span>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="inline-flex items-center gap-2 rounded-full border border-red-500 px-3 py-1.5 text-sm font-semibold text-red-500 transition hover:bg-red-500/10">
+                        <span class="material-symbols-outlined text-base">logout</span>
+                        <span>{{ translate('Logout', 'లాగ్ అవుట్') }}</span>
+                    </a>
                 </div>
             </div>
         </header>
 
-        <main>
-            <div class="content-wrap">
-                <section class="hero-card">
-                    <span class="badge-soft" data-i18n="farmer.help_page.badge">Need volunteer guidance</span>
-                    <h1 data-i18n="farmer.help_page.title">Ask a volunteer to guide you</h1>
-                    <p data-i18n="farmer.help_page.subtitle">
-                        Volunteers can call you, explain the work clearly, and post a task on your behalf if needed. Pick someone from your village or a nearby village and send them a request.
-                    </p>
-                </section>
+        <main class="flex-1 space-y-8">
+            <section class="grid gap-6 rounded-3xl bg-white p-6 shadow-sm shadow-primary/20 dark:bg-gray-900 lg:grid-cols-[1.4fr_1fr]">
+                <div class="space-y-4">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ translate('Need guidance?', 'మార్గనిర్దేశనం కావాలా?') }}</span>
+                    <h2 class="text-2xl font-semibold leading-snug">{{ translate('Volunteers can post tasks for you and coordinate workers by phone.', 'సేవకులు మీ కోసం పనులను పోస్ట్ చేసి, ఫోన్ ద్వారా కార్మికులను సమన్వయం చేస్తారు.') }}</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ translate('Choose a volunteer you trust. They will call you to understand the work and update the platform on your behalf.', 'మీరు నమ్మే సేవకుడిని ఎంచుకోండి. వారు మీతో మాట్లాడి పనిని వివరంగా తెలుసుకొని, మీ తరఫున ప్లాట్‌ఫారమ్‌లో నవీకరిస్తారు.') }}</p>
+                </div>
+                <div class="rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-primary">
+                    {% if farmer %}
+                        <p class="font-semibold">{{ translate('Your details', 'మీ వివరాలు') }}</p>
+                        <p class="mt-2 text-primary/80">{{ translate('Name', 'పేరు') }}: {{ farmer.name }}</p>
+                        <p class="text-primary/80">{{ translate('Phone', 'ఫోన్') }}: {{ farmer.phone }}</p>
+                        <p class="text-primary/80">{{ translate('Village', 'గ్రామం') }}: {{ farmer.village|capitalize }}</p>
+                    {% else %}
+                        <p class="font-semibold">{{ translate('Not logged in as farmer', 'రైతుగా లాగిన్ కాలేదు') }}</p>
+                        <p class="mt-2 text-primary/80">{{ translate('You can still browse volunteers. Login to send a request.', 'మీరు సేవకులను చూడవచ్చు. అభ్యర్థన పంపడానికి లాగిన్ అవ్వండి.') }}</p>
+                    {% endif %}
+                </div>
+            </section>
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show alert-custom" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="space-y-3">
+                        {% for category, message_text in messages %}
+                            <div class="flex items-start gap-3 rounded-2xl border border-primary/20 bg-white/95 p-4 text-sm shadow-sm shadow-primary/15 dark:border-primary/40 dark:bg-gray-900">
+                                <span class="material-symbols-outlined text-primary">info</span>
+                                <div>
+                                    <p class="font-semibold text-primary">{{ flash_labels.get(category, flash_default) }}</p>
+                                    <p class="mt-1 text-gray-600 dark:text-gray-200">{{ message_text }}</p>
+                                </div>
                             </div>
                         {% endfor %}
-                    {% endif %}
-                {% endwith %}
+                    </div>
+                {% endif %}
+            {% endwith %}
 
-                <section class="info-banner">
-                    <div>
-                        <h2 data-i18n="farmer.help_page.tip_title">How volunteer help works</h2>
-                        <p data-i18n="farmer.help_page.tip_body">
-                            After you send a request, the volunteer will receive your phone number and village. They will call you, collect details gently, and make sure workers understand the task.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="/worker_help" class="btn btn-soft" data-i18n="farmer.help_page.link_worker">Help a worker get support</a>
-                    </div>
-                </section>
+            <section class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <article class="rounded-3xl bg-white p-6 shadow-sm shadow-primary/20 dark:bg-gray-900">
+                    <h3 class="text-lg font-semibold text-[#1f2715] dark:text-gray-100">{{ translate('Send a help request', 'సహాయ అభ్యర్థన పంపండి') }}</h3>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ translate('Pick the volunteer you want to work with. They will receive an alert with your phone number.', 'మీకు అనుకూలమైన సేవకుడిని ఎంచుకోండి. మీ ఫోన్ నంబర్‌తో వారికి సమాచారం పంపబడుతుంది.') }}</p>
+                    <form method="POST" class="mt-4 grid gap-4">
+                        <label class="grid gap-1 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                            <span>{{ translate('Volunteer', 'సేవకుడు') }}</span>
+                            <select name="volunteer_id" class="rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100" {% if not volunteer_options %}disabled{% endif %}>
+                                <option value="">{{ translate('Select a volunteer', 'ఒక సేవకుడిని ఎంచుకోండి') }}</option>
+                                {% for vol in volunteer_options %}
+                                    <option value="{{ vol.id }}">
+                                        {{ vol.name }}{% if vol.village %} · {{ vol.village|capitalize }}{% endif %}{% if vol.phone %} ({{ vol.phone }}){% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if not volunteer_options %}
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ translate('No volunteers are available yet. Please try again soon.', 'ఇంకా సేవకులు అందుబాటులో లేరు. కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.') }}</span>
+                            {% endif %}
+                        </label>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark" {% if not volunteer_options or not farmer %}disabled{% endif %}>
+                            <span class="material-symbols-outlined text-base text-white">send</span>
+                            <span>{{ translate('Send request', 'అభ్యర్థన పంపండి') }}</span>
+                        </button>
+                        {% if not farmer %}
+                            <p class="text-xs text-amber-600 dark:text-amber-300">{{ translate('Login as a farmer to submit a request.', 'అభ్యర్థనను సమర్పించడానికి రైతుగా లాగిన్ అవ్వండి.') }}</p>
+                        {% endif %}
+                    </form>
+                </article>
 
-                <section class="panel">
-                    <div class="panel-header">
-                        <h2 data-i18n="farmer.help_page.section_title">Volunteers by village</h2>
-                        <p class="mb-0 small text-muted" data-i18n="farmer.help_page.section_subtitle">Pick whoever is closest to you. You can send more than one request if needed.</p>
-                    </div>
-                    {% if villages %}
-                        <div class="volunteer-grid">
-                            {% for v in villages %}
-                                {% set vol = volunteers_by_village.get(v) %}
-                                <div class="vol-card">
-                                    <h3>{{ v.capitalize() }}</h3>
-                                    {% if vol %}
-                                        <p><strong data-i18n="farmer.help_page.volunteer_name">Volunteer</strong>: {{ vol.name }}</p>
-                                        <p><strong data-i18n="contact.phone">Phone Number</strong>: {{ vol.phone }}</p>
-                                        <small data-i18n="farmer.help_page.volunteer_tip">They usually respond within a few minutes.</small>
-                                        <form method="POST" action="/farmer_help" class="mt-2">
-                                            <input type="hidden" name="volunteer_id" value="{{ vol._id }}">
-                                            <button type="submit" class="btn btn-primary btn-sm" data-i18n="farmer.help_page.button_request">Send request</button>
-                                        </form>
-                                    {% else %}
-                                        <p class="text-muted" data-i18n="farmer.help_page.no_volunteer">No volunteer listed for this village yet.</p>
-                                        <small data-i18n="farmer.help_page.no_volunteer_tip">Choose a volunteer from a nearby village.</small>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="empty-state" data-i18n="farmer.help_page.empty">Volunteers are being onboarded. Please check again shortly.</div>
-                    {% endif %}
-                </section>
-            </div>
+                <aside class="space-y-4 rounded-3xl bg-white p-6 shadow-sm shadow-primary/20 dark:bg-gray-900">
+                    <h3 class="text-lg font-semibold">{{ translate('How this works', 'ఇది ఎలా పనిచేస్తుంది') }}</h3>
+                    <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary">phone_in_talk</span>
+                            <span>{{ translate('Volunteer calls you to note crop details, wages, and timings.', 'సేవకుడు పంట, వేతనం, సమయాలు వంటి వివరాలు తెలుసుకోవడానికి మీకు కాల్ చేస్తాడు.') }}</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary">task_alt</span>
+                            <span>{{ translate('They post or update the task so workers can see it quickly.', 'వారు పనిని పోస్ట్ చేసి లేదా నవీకరించి, కార్మికులు త్వరగా చూడేలా చేస్తారు.') }}</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary">handshake</span>
+                            <span>{{ translate('Volunteers also coordinate when workers accept your task.', 'కార్మికులు పనిని అంగీకరించినప్పుడు సేవకులు సమన్వయం చేస్తారు.') }}</span>
+                        </li>
+                    </ul>
+                </aside>
+            </section>
+
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-[#1f2715] dark:text-gray-100">{{ translate('Volunteers by village', 'గ్రామాల వారీగా సేవకులు') }}</h3>
+                    <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">{{ translate('Total volunteers', 'మొత్తం సేవకులు') }}: {{ volunteer_options|length }}</span>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    {% for group in volunteer_groups %}
+                        <article class="rounded-2xl border border-primary/15 bg-white p-5 shadow-sm dark:border-primary/40 dark:bg-gray-900">
+                            <header class="mb-3 flex items-center justify-between">
+                                <h4 class="text-lg font-semibold text-primary">{{ group.label|capitalize }}</h4>
+                                <span class="text-xs uppercase tracking-[0.3em] text-gray-400">{{ translate('Village', 'గ్రామం') }}</span>
+                            </header>
+                            {% if group.volunteers %}
+                                <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+                                    {% for vol in group.volunteers %}
+                                        <li class="rounded-xl border border-primary/10 bg-primary/5 p-3 dark:border-primary/30 dark:bg-primary/10">
+                                            <p class="font-semibold text-primary">{{ vol.name }}</p>
+                                            {% if vol.phone %}
+                                                <p class="text-xs text-gray-500 dark:text-gray-300">{{ translate('Phone', 'ఫోన్') }}: {{ vol.phone }}</p>
+                                                <a href="tel:{{ vol.phone }}" class="mt-2 inline-flex items-center gap-2 rounded-full border border-primary px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10 dark:border-primary/50 dark:text-primary">
+                                                    <span class="material-symbols-outlined text-sm">call</span>
+                                                    <span>{{ translate('Call volunteer', 'సేవకునికి కాల్ చేయండి') }}</span>
+                                                </a>
+                                            {% else %}
+                                                <p class="text-xs text-gray-400">{{ translate('Phone not provided', 'ఫోన్ అందుబాటులో లేదు') }}</p>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-sm text-gray-400">{{ translate('No volunteer listed for this village yet.', 'ఈ గ్రామానికి ఇంకా సేవకుడు నమోదు కాలేదు.') }}</p>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
 </body>
 </html>

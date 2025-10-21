@@ -265,6 +265,17 @@
                     <h3 data-i18n="admin.metric.tasks_completed">Completed</h3>
                     <strong>{{ stats.completed_tasks }}</strong>
                 </div>
+                <div class="metric-card">
+                    <h3>{{ translate('Worker rating', 'కార్మికుల రేటింగ్') }}</h3>
+                    <strong>
+                        {% if stats.ratings_avg %}
+                            {{ stats.ratings_avg }}/5
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                    <p class="mt-2 text-xs text-muted">{{ translate('Total reviews', 'మొత్తం సమీక్షలు') }}: {{ stats.ratings_count }}</p>
+                </div>
             </section>
 
             <div class="grid-two">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>AgriConnect · Volunteer</title>
+    <title>{{ translate('Volunteer Dashboard', 'సేవకుల డ్యాష్‌బోర్డ్') }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,21 +48,63 @@
     <div class="flex min-h-screen flex-col">
         <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-4 shadow-sm dark:border-gray-700 dark:bg-background-dark">
             <div>
-                <p class="text-xs uppercase tracking-[0.4em] text-gray-500 dark:text-gray-500">AgriConnect</p>
-                <h1 class="text-2xl font-bold leading-tight text-[#2b2b2b] dark:text-gray-100">Hello, {{ volunteer.name }}! / హలో {{ volunteer.name }}!</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Coordinate farmers and workers from one place. / రైతులు మరియు కార్మికులను ఒకే స్థానంలో సమన్వయం చేయండి.</p>
+                <p class="text-xs uppercase tracking-[0.4em] text-gray-500 dark:text-gray-500"></p>
+                <h1 class="text-2xl font-bold leading-tight text-[#2b2b2b] dark:text-gray-100">{{ translate('Hello, ' ~ volunteer.name ~ '!', 'హలో ' ~ volunteer.name ~ '!') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ translate('Coordinate farmers and workers from one place.', 'రైతులు మరియు కార్మికులను ఒకే చోటు నుండి సమన్వయం చేయండి.') }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="hidden rounded-xl bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow dark:bg-gray-900 dark:text-gray-200 sm:flex sm:flex-col sm:items-end">
                     <span class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">location_on</span>
-                        {{ volunteer.village|capitalize }} · గ్రామం
+                        {{ volunteer.village|capitalize }} · {{ translate('Village', 'గ్రామం') }}
                     </span>
                     <span class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                         <span class="material-symbols-outlined text-primary">call</span>
-                        {{ volunteer.phone }} · ఫోన్
+                        {{ volunteer.phone }} · {{ translate('Phone', 'ఫోన్') }}
                     </span>
                 </div>
+                {% set pending_count = pending_requests|length %}
+                <details class="relative [&_summary::-webkit-details-marker]:hidden">
+                    <summary class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-gray-200 text-[#2b2b2b] transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100">
+                        <span class="material-symbols-outlined text-xl">notifications</span>
+                        {% if pending_count %}
+                            <span class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white">{{ pending_count }}</span>
+                        {% endif %}
+                    </summary>
+                    <div class="absolute right-0 mt-3 w-72 rounded-2xl border border-primary/20 bg-white p-4 text-sm shadow-lg shadow-primary/20 dark:border-primary/40 dark:bg-background-dark">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Pending requests', 'పెండింగ్ అభ్యర్థనలు') }}</h3>
+                            <a href="#pending" class="text-xs font-semibold text-primary hover:underline">{{ translate('View all', 'అన్నీ చూడండి') }}</a>
+                        </div>
+                        <div class="mt-3 max-h-64 space-y-3 overflow-y-auto">
+                            {% if pending_count %}
+                                {% for req in pending_requests[:6] %}
+                                    <article class="rounded-xl border border-primary/15 bg-primary/5 p-3 text-xs text-[#2b2b2b] dark:border-primary/30 dark:bg-primary/10 dark:text-gray-100">
+                                        <p class="font-semibold text-primary">
+                                            {% if req.request_type == 'farmer_help' %}
+                                                {{ translate('Farmer help request', 'రైతు సహాయ అభ్యర్థన') }}
+                                            {% else %}
+                                                {{ translate('Worker help request', 'కార్మిక సహాయ అభ్యర్థన') }}
+                                            {% endif %}
+                                        </p>
+                                        <p class="mt-1 flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-300">
+                                            <span class="material-symbols-outlined !text-[14px] text-primary">schedule</span>{{ req.created_at | timestamp_to_datetime }}
+                                        </p>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-300">
+                                            {% if req.request_type == 'farmer_help' %}
+                                                {{ translate('Farmer', 'రైతు') }}: {{ req.farmer_name or '—' }}
+                                            {% else %}
+                                                {{ translate('Worker', 'కార్మికుడు') }}: {{ req.worker_details.name or '—' }}
+                                            {% endif %}
+                                        </p>
+                                    </article>
+                                {% endfor %}
+                            {% else %}
+                                <p class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-4 text-center text-xs text-gray-500 dark:text-gray-300">{{ translate('No pending requests at the moment.', 'ప్రస్తుతం పెండింగ్ అభ్యర్థనలు లేవు.') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </details>
                 <a href="/logout" class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-[#2b2b2b] transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100">
                     <span class="material-symbols-outlined text-2xl">logout</span>
                 </a>
@@ -78,7 +120,7 @@
                                 <div class="flex items-start gap-3">
                                     <span class="material-symbols-outlined text-primary">info</span>
                                     <div>
-                                        <p class="font-semibold text-primary">{{ category|capitalize }}</p>
+                                        <p class="font-semibold text-primary">{{ flash_labels.get(category, flash_default) }}</p>
                                         <p class="mt-1">{{ msg }}</p>
                                     </div>
                                 </div>
@@ -92,7 +134,7 @@
                         <div class="flex items-start gap-3">
                             <span class="material-symbols-outlined text-primary">info</span>
                             <div>
-                                <p class="font-semibold text-primary">{{ message_type|default('Notice')|capitalize }}</p>
+                                <p class="font-semibold text-primary">{{ flash_labels.get(message_type, flash_default) }}</p>
                                 <p class="mt-1">{{ message }}</p>
                             </div>
                         </div>
@@ -101,28 +143,28 @@
 
                 <section class="grid gap-4 rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900 md:grid-cols-2">
                     <div class="space-y-3">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Volunteer workspace / సేవకుల కార్యవేదిక</span>
-                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Guide your community / మీ సమాజాన్ని నడిపించండి</h2>
+                        <span class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{{ translate('Volunteer workspace', 'సేవకుల కార్యవేదిక') }}</span>
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Guide your community', 'మీ సమాజాన్ని నడిపించండి') }}</h2>
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Accept farmer requests, post tasks for workers, and follow up with volunteer coordination in one dashboard. / రైతుల అభ్యర్థనలను అంగీకరించి, కార్మికులకు పనులను పంపించి, ఒకే డ్యాష్‌బోర్డ్‌లో సమన్వయం చేయండి.
+                            {{ translate('Accept farmer requests, post tasks for workers, and follow up with volunteer coordination in one dashboard.', 'రైతుల అభ్యర్థనలను అంగీకరించి, కార్మికులకు పనులను పంపించి, ఒకే డ్యాష్‌బోర్డ్‌లో సమన్వయం చేయండి.') }}
                         </p>
                     </div>
                     <div class="grid gap-3 text-sm text-gray-600 dark:text-gray-300">
                         <div class="flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
-                            <span class="font-medium text-gray-500 dark:text-gray-400">Pending requests / పెండింగ్ అభ్యర్థనలు</span>
+                            <span class="font-medium text-gray-500 dark:text-gray-400">{{ translate('Pending requests', 'పెండింగ్ అభ్యర్థనలు') }}</span>
                             <span class="text-lg font-semibold text-primary">{{ pending_requests|length }}</span>
                         </div>
                         <div class="flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
-                            <span class="font-medium text-gray-500 dark:text-gray-400">Tasks posted / పోస్ట్ చేసిన పనులు</span>
+                            <span class="font-medium text-gray-500 dark:text-gray-400">{{ translate('Tasks posted', 'పోస్ట్ చేసిన పనులు') }}</span>
                             <span class="text-lg font-semibold text-primary">{{ volunteer_tasks|length }}</span>
                         </div>
                     </div>
                 </section>
 
-                <section class="space-y-4">
+                <section id="pending" class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Pending Requests / పెండింగ్ అభ్యర్థనలు</h2>
-                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Review & respond / సమీక్షించి స్పందించండి</span>
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Pending Requests', 'పెండింగ్ అభ్యర్థనలు') }}</h2>
+                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">{{ translate('Review & respond', 'సమీక్షించి స్పందించండి') }}</span>
                     </div>
                     {% if pending_requests %}
                         <div class="grid gap-4">
@@ -130,19 +172,46 @@
                                 <article class="rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
                                     <header class="flex flex-wrap items-start justify-between gap-3">
                                         <div>
-                                            <p class="text-sm font-semibold text-primary uppercase tracking-[0.25em]">{{ req.request_type.replace('_', ' ') }}</p>
+                                            {% set request_label = translate('Farmer help', 'రైతు సహాయం') if req.request_type == 'farmer_help' else translate('Worker help', 'కార్మిక సహాయం') %}
+                                            <p class="text-sm font-semibold text-primary uppercase tracking-[0.25em]">{{ request_label }}</p>
                                             {% if req.request_type == 'farmer_help' %}
-                                                <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">Farmer {{ req.farmer_name }} / రైతు {{ req.farmer_name }}</h3>
+                                                <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Farmer ' ~ req.farmer_name, 'రైతు ' ~ req.farmer_name) }}</h3>
                                                 {% if req.farmer_details %}
                                                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                                                        {{ req.farmer_details.village|capitalize }} · {{ req.farmer_details.phone }} · గ్రామం · ఫోన్
+                                                        {{ req.farmer_details.village|capitalize }} · {{ translate('Village', 'గ్రామం') }} • {{ req.farmer_details.phone }} · {{ translate('Phone', 'ఫోన్') }}
                                                     </p>
                                                 {% endif %}
                                             {% else %}
-                                                <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">{{ req.worker_details.name }} / కార్మికుడు</h3>
+                                                <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Worker ' ~ req.worker_details.name, 'కార్మికుడు ' ~ req.worker_details.name) }}</h3>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ req.worker_details.phone }} · {{ req.worker_details.village|capitalize }} · ఫోన్ · గ్రామం
+                                                    {{ req.worker_details.phone }} · {{ translate('Phone', 'ఫోన్') }} • {{ req.worker_details.village|capitalize }} · {{ translate('Village', 'గ్రామం') }}
                                                 </p>
+                                                <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                    {% if req.worker_details.preferred_wage %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary dark:bg-primary/20">
+                                                            <span class="material-symbols-outlined text-sm">currency_rupee</span>₹{{ req.worker_details.preferred_wage }} {{ translate('per day', 'రోజుకు') }}
+                                                        </span>
+                                                    {% endif %}
+                                                    {% if req.worker_details.availability %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary dark:bg-primary/20">
+                                                            <span class="material-symbols-outlined text-sm">schedule</span>
+                                                            {% if req.worker_details.availability == 'full_time' %}
+                                                                {{ translate('Full day', 'పూర్తి రోజు') }}
+                                                            {% elif req.worker_details.availability == 'half_day' %}
+                                                                {{ translate('Half day', 'అర రోజు') }}
+                                                            {% elif req.worker_details.availability == 'weekends' %}
+                                                                {{ translate('Weekends', 'వారాంతాలు') }}
+                                                            {% elif req.worker_details.availability == 'seasonal' %}
+                                                                {{ translate('Seasonal / on call', 'రుతుపవన / అవసరమైనప్పుడు') }}
+                                                            {% endif %}
+                                                        </span>
+                                                    {% endif %}
+                                                    {% if req.worker_details.average_rating %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">
+                                                            <span class="material-symbols-outlined text-sm">star</span>{{ req.worker_details.average_rating }}/5 · {{ req.worker_details.rating_count }} {{ translate('ratings', 'రేటింగ్స్') }}
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
                                             {% endif %}
                                         </div>
                                         <span class="text-xs text-gray-400 dark:text-gray-500">{{ req.created_at | timestamp_to_datetime }}</span>
@@ -156,7 +225,7 @@
                                                     <input type="hidden" name="request_id" value="{{ req.id }}">
 
                                                     <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                                        <span>Task title / పనിയുടെ శీర్షిక</span>
+                                                        <span>{{ translate('Task title', 'పనിയുടെ శీర్షిక') }}</span>
                                                         <div>
                                                             <input list="task-options-{{ loop.index }}" name="task_name" value="General Farm Help"
                                                                    class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
@@ -169,7 +238,7 @@
                                                     </label>
 
                                                     <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                                        <span>Village / గ్రామం</span>
+                                                        <span>{{ translate('Village', 'గ్రామం') }}</span>
                                                         <select name="task_village" class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
                                                             {% for v in villages %}
                                                                 <option value="{{ v }}" {% if req.farmer_details and req.farmer_details.village and req.farmer_details.village.lower() == v.lower() %}selected{% endif %}>{{ v|capitalize }}</option>
@@ -179,28 +248,28 @@
 
                                                     <div class="grid gap-3 sm:grid-cols-2">
                                                         <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                                            <span>Wage (₹/day) / రోజువారీ వేతనం</span>
+                                                            <span>{{ translate('Wage (₹/day)', 'రోజువారీ వేతనం (₹)') }}</span>
                                                             <input type="number" step="0.01" min="0" name="task_wage" value="500"
                                                                    class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
                                                         </label>
                                                         <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                                            <span>Workers needed / కావలసిన కార్మికులు</span>
+                                                            <span>{{ translate('Workers needed', 'కావలసిన కార్మికులు') }}</span>
                                                             <input type="number" min="1" max="50" name="task_workers" value="2"
                                                                    class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
                                                         </label>
                                                     </div>
 
                                                     <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                                        <span>Description / వివరణ</span>
+                                                        <span>{{ translate('Description', 'వివరణ') }}</span>
                                                         <textarea name="task_description" rows="3"
                                                                   class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100"
-                                                                  placeholder="Share quick instructions for workers or additional context for the farm."></textarea>
+                                                                  placeholder="{{ translate('Share quick instructions for workers or additional context for the farm.', 'కార్మికుల కోసం సూచనలు లేదా అదనపు వివరాలు నమోదు చేయండి.') }}"></textarea>
                                                     </label>
 
                                                     <button type="submit"
                                                             class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
                                                         <span class="material-symbols-outlined !text-base text-white">check_circle</span>
-                                                        <span>Accept & Post Task / అంగీకరించి పని పోస్ట్ చేయండి</span>
+                                                        <span>{{ translate('Accept & Post Task', 'అంగీకరించి పని పోస్ట్ చేయండి') }}</span>
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="/volunteer" class="inline-flex">
@@ -209,21 +278,45 @@
                                                     <button type="submit"
                                                             class="inline-flex items-center gap-2 rounded-xl border border-red-400 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400/60 dark:text-red-200 dark:hover:bg-red-500/10">
                                                         <span class="material-symbols-outlined !text-base">close</span>
-                                                        <span>Decline / తిరస్కరించండి</span>
+                                                        <span>{{ translate('Decline', 'తిరస్కరించండి') }}</span>
                                                     </button>
                                                 </form>
                                             </div>
                                         </div>
                                     {% else %}
                                         <div class="mt-4 grid gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm text-gray-600 dark:text-gray-300">
-                                            <p><strong class="text-primary">Phone / ఫోన్:</strong> {{ req.worker_details.phone }}</p>
-                                            <p><strong class="text-primary">Village / గ్రామం:</strong> {{ req.worker_details.village|capitalize }}</p>
+                                            <p><strong class="text-primary">{{ translate('Phone', 'ఫోన్') }}:</strong> {{ req.worker_details.phone }}</p>
+                                            <p><strong class="text-primary">{{ translate('Village', 'గ్రామం') }}:</strong> {{ req.worker_details.village|capitalize }}</p>
+                                            {% if req.worker_details.preferred_wage %}
+                                                <p><strong class="text-primary">{{ translate('Preferred wage', 'ఇష్టమైన వేతనం') }}:</strong> ₹{{ req.worker_details.preferred_wage }} {{ translate('per day', 'రోజుకు') }}</p>
+                                            {% endif %}
+                                            {% if req.worker_details.availability %}
+                                                <p><strong class="text-primary">{{ translate('Availability', 'లభ్యత') }}:</strong>
+                                                    {% if req.worker_details.availability == 'full_time' %}
+                                                        {{ translate('Full day', 'పూర్తి రోజు') }}
+                                                    {% elif req.worker_details.availability == 'half_day' %}
+                                                        {{ translate('Half day', 'అర రోజు') }}
+                                                    {% elif req.worker_details.availability == 'weekends' %}
+                                                        {{ translate('Weekends', 'వారాంతాలు') }}
+                                                    {% elif req.worker_details.availability == 'seasonal' %}
+                                                        {{ translate('Seasonal / on call', 'రుతుపవన / అవసరమైనప్పుడు') }}
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
                                             {% if req.worker_details.notes %}
-                                                <p><strong class="text-primary">Notes / గమనికలు:</strong> {{ req.worker_details.notes }}</p>
+                                                <p><strong class="text-primary">{{ translate('Notes', 'గమనికలు') }}:</strong> {{ req.worker_details.notes }}</p>
+                                            {% endif %}
+                                            {% if req.worker_details.skills %}
+                                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-300">{{ translate('Skills', 'నైపుణ్యాలు') }}:</p>
+                                                <div class="mt-1 flex flex-wrap gap-2">
+                                                    {% for skill in req.worker_details.skills %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary dark:bg-primary/20">{{ skill }}</span>
+                                                    {% endfor %}
+                                                </div>
                                             {% endif %}
                                             {% if req.task_details %}
-                                                <p><strong class="text-primary">Task / పని:</strong> {{ req.task_details.task_name or 'Not specified' }}</p>
-                                                <p><strong class="text-primary">Location / స్థలం:</strong> {{ req.task_details.task_location or 'Not specified' }}</p>
+                                                <p><strong class="text-primary">{{ translate('Task', 'పని') }}:</strong> {{ translate(req.task_details.task_name or 'Not specified', req.task_details.task_name or 'సూచించలేదు') }}</p>
+                                                <p><strong class="text-primary">{{ translate('Location', 'స్థలం') }}:</strong> {{ translate(req.task_details.task_location or 'Not specified', req.task_details.task_location or 'సూచించలేదు') }}</p>
                                             {% endif %}
                                             <div class="flex flex-wrap gap-3 pt-2">
                                                 <form method="POST" action="/volunteer">
@@ -232,7 +325,7 @@
                                                      <button type="submit"
                                                              class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
                                                         <span class="material-symbols-outlined !text-base text-white">check_circle</span>
-                                                        <span>Accept / అంగీకరించండి</span>
+                                                        <span>{{ translate('Accept', 'అంగీకరించండి') }}</span>
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="/volunteer">
@@ -241,7 +334,7 @@
                                                      <button type="submit"
                                                              class="inline-flex items-center gap-2 rounded-xl border border-red-400 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400/60 dark:text-red-200 dark:hover:bg-red-500/10">
                                                         <span class="material-symbols-outlined !text-base">close</span>
-                                                        <span>Decline / తిరస్కరించండి</span>
+                                                        <span>{{ translate('Decline', 'తిరస్కరించండి') }}</span>
                                                     </button>
                                                 </form>
                                             </div>
@@ -252,33 +345,33 @@
                         </div>
                     {% else %}
                         <div class="rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-gray-500 shadow dark:border-primary/40 dark:bg-gray-900 dark:text-gray-300">
-                            No pending requests right now. Workers and farmers will appear here as soon as they reach out. / ప్రస్తుతం పెండింగ్ అభ్యర్థనలు లేవు. కార్మికులు మరియు రైతులు సంప్రదించగానే ఇక్కడ కనిపిస్తారు.
+                            {{ translate('No pending requests right now. Workers and farmers will appear here as soon as they reach out.', 'ప్రస్తుతం పెండింగ్ అభ్యర్థనలు లేవు. కార్మికులు మరియు రైతులు సంప్రదించగానే అవి ఇక్కడ కనిపిస్తాయి.') }}
                         </div>
                     {% endif %}
                 </section>
 
                 <section class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Post a Task for Workers / కార్మికుల కోసం పని పోస్ట్ చేయండి</h2>
-                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Manual posting / చేతివేసి ప్రచురణ</span>
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Post a Task for Workers', 'కార్మికుల కోసం పని పోస్ట్ చేయండి') }}</h2>
+                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">{{ translate('Manual posting', 'చేతివేసి ప్రచురణ') }}</span>
                     </div>
                     <article class="rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
                         <form method="POST" action="/volunteer" class="grid gap-3">
                             <input type="hidden" name="action" value="create_task">
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                    <span>Village / గ్రామం</span>
+                                    <span>{{ translate('Village', 'గ్రామం') }}</span>
                                     <select name="village" class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
-                                        <option value="">Select village / గ్రామాన్ని ఎంచుకోండి</option>
+                                        <option value="">{{ translate('Select village', 'గ్రామాన్ని ఎంచుకోండి') }}</option>
                                         {% for v in villages %}
                                             <option value="{{ v }}">{{ v|capitalize }}</option>
                                         {% endfor %}
                                     </select>
                                 </label>
                                 <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                    <span>Task type / పనుల రకం</span>
+                                    <span>{{ translate('Task type', 'పనుల రకం') }}</span>
                                     <select name="task" class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
-                                        <option value="">Select task / పనిని ఎంచుకోండి</option>
+                                        <option value="">{{ translate('Select task', 'పనిని ఎంచుకోండి') }}</option>
                                         {% for task_option in tasks %}
                                             <option value="{{ task_option }}">{{ task_option }}</option>
                                         {% endfor %}
@@ -287,26 +380,26 @@
                             </div>
                             <div class="grid gap-3 sm:grid-cols-2">
                                 <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                    <span>Wage (₹/day) / రోజువారీ వేతనం</span>
+                                    <span>{{ translate('Wage (₹/day)', 'రోజువారీ వేతనం (₹)') }}</span>
                                     <input type="number" step="0.01" min="0" name="wage"
                                            class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
                                 </label>
                                 <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                    <span>Workers needed / కావలసిన కార్మికులు</span>
+                                    <span>{{ translate('Workers needed', 'కావలసిన కార్మికులు') }}</span>
                                     <input type="number" min="1" max="50" name="num_workers" value="1"
                                            class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100">
                                 </label>
                             </div>
                             <label class="grid gap-1 text-sm font-semibold text-[#2b2b2b] dark:text-gray-100">
-                                <span>Description / వివరణ</span>
+                                <span>{{ translate('Description', 'వివరణ') }}</span>
                                 <textarea name="description" rows="3"
                                           class="w-full rounded-xl border border-primary/30 bg-white px-3 py-2 text-sm text-[#2b2b2b] focus:border-primary focus:ring-primary dark:bg-gray-800 dark:text-gray-100"
-                                          placeholder="Share any additional instructions or context for workers."></textarea>
+                                          placeholder="{{ translate('Share any additional instructions or context for workers.', 'కార్మికుల కోసం అదనపు సూచనలు లేదా వివరాలు నమోదు చేయండి.') }}"></textarea>
                             </label>
                             <button type="submit"
                                     class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
                                 <span class="material-symbols-outlined !text-base text-white">add_circle</span>
-                                <span>Create Task / పని సృష్టించండి</span>
+                                <span>{{ translate('Create Task', 'పని సృష్టించండి') }}</span>
                             </button>
                         </form>
                     </article>
@@ -314,8 +407,8 @@
 
                 <section class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">Recent Tasks You Posted / మీరు పోస్ట్ చేసిన తాజా పనులు</h2>
-                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Latest {{ volunteer_tasks|length }} / తాజాగా {{ volunteer_tasks|length }}</span>
+                        <h2 class="text-xl font-semibold text-[#2b2b2b] dark:text-gray-100">{{ translate('Recent Tasks You Posted', 'మీరు పోస్ట్ చేసిన తాజా పనులు') }}</h2>
+                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">{{ translate('Latest', 'తాజా') }} {{ volunteer_tasks|length }}</span>
                     </div>
                     {% if volunteer_tasks %}
                         <div class="grid gap-4 md:grid-cols-2">
@@ -326,18 +419,20 @@
                                             <h3 class="text-lg font-semibold text-[#2b2b2b] dark:text-gray-100">{{ task.task }}</h3>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">{{ task.village }}, {{ task.mandal }}</p>
                                         </div>
+                                        {% set status_key = task.status|default('open') %}
                                         <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                                            {{ task.status|default('open')|capitalize }} / {{ volunteer_status_labels.get(task.status|default('open'), '') }}
+                                            {{ volunteer_status_labels.get(status_key, status_key.replace('_', ' ')|title()) }}
                                         </span>
                                     </header>
                                     <dl class="mt-3 grid gap-2 text-sm text-gray-600 dark:text-gray-300">
                                         <div class="flex items-center gap-1.5">
                                             <span class="material-symbols-outlined !text-base text-primary">currency_rupee</span>
-                                            <span>₹{{ task.wage }}/day · రోజుకు</span>
+                                            <span>₹{{ task.wage }} {{ translate('per day', 'రోజుకు') }}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="material-symbols-outlined !text-base text-primary">group</span>
-                                            <span>{{ task.num_workers }} workers / కార్మికులు</span>
+                                            {% set worker_count = task.num_workers if task.num_workers is not none else 0 %}
+                                            <span>{{ translate(worker_count ~ ' workers', worker_count ~ ' కార్మికులు') }}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <span class="material-symbols-outlined !text-base text-primary">schedule</span>
@@ -352,7 +447,7 @@
                         </div>
                     {% else %}
                         <div class="rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-gray-500 shadow dark:border-primary/40 dark:bg-gray-900 dark:text-gray-300">
-                            Your posted tasks will appear here once you create them. / మీరు పనులు సృష్టించిన తర్వాత అవి ఇక్కడ కనిపిస్తాయి.
+                            {{ translate('Your posted tasks will appear here once you create them.', 'మీరు పనులు సృష్టించిన తర్వాత అవి ఇక్కడ కనిపిస్తాయి.') }}
                         </div>
                     {% endif %}
                 </section>

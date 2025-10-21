@@ -1,29 +1,33 @@
 <!DOCTYPE html>
-<html lang="{{ lang or 'en' }}">
+<html class="light" lang="{{ lang or 'en' }}">
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>AgriConnect · Worker</title>
+    <title>{{ translate('Worker Dashboard', 'కార్మికుల డ్యాష్‌బోర్డ్') }}</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        primary: "#4CAF50",
-                        "primary-dark": "#388E3C",
-                        "background-light": "#F5F5F5",
-                        "background-dark": "#1a1a1a",
-                        secondary: "#8D6E63",
-                        accent: "#FFC107"
+                        primary: "#2F5233",
+                        accent: "#E87500",
+                        "background-light": "#FCFCFC",
+                        "background-dark": "#152111",
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1F2E1A",
+                        "text-light": "#1C1C1C",
+                        "text-dark": "#E0E0E0",
+                        "border-light": "#EAEAEA",
+                        "border-dark": "#3A4A39"
                     },
                     fontFamily: {
-                        display: ["Public Sans", "Noto Sans Telugu", "sans-serif"]
+                        display: ["Inter", "Noto Sans Telugu", "sans-serif"]
                     },
                     borderRadius: {
                         DEFAULT: "0.5rem",
@@ -37,254 +41,583 @@
     </script>
     <style>
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        body {
-            min-height: 100vh;
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
         }
     </style>
 </head>
-<body class="bg-background-light font-display text-[#333333] dark:bg-background-dark dark:text-gray-200">
-    <div class="flex min-h-screen flex-col">
-        <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-4 shadow-sm dark:border-gray-700 dark:bg-background-dark">
-            <div>
-                <p class="text-xs uppercase tracking-[0.4em] text-gray-500 dark:text-gray-400">AgriConnect</p>
-                <h1 class="text-2xl font-bold leading-tight text-[#333333] dark:text-gray-100">Hello, {{ worker.name }}! / హలో {{ worker.name }}!</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Find your next job today. / మీ తదుపరి పనిని ఈరోజే కనుగొనండి.</p>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+    {% set is_te = (lang == 'te') %}
+    {% if help_modal %}
+    <div id="help-modal" class="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4 py-6">
+        <div class="relative w-full max-w-md rounded-xl bg-card-light p-6 text-center shadow-xl shadow-primary/20 dark:bg-card-dark">
+            <button type="button" class="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full border border-border-light text-text-light transition hover:bg-border-light/40 dark:border-border-dark dark:text-text-dark dark:hover:bg-border-dark/40" onclick="closeWorkerModal()">
+                <span class="material-symbols-outlined text-base">close</span>
+            </button>
+            <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span class="material-symbols-outlined text-2xl">volunteer_activism</span>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="hidden rounded-xl bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow dark:bg-gray-800 dark:text-gray-200 sm:block">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-base text-primary">location_on</span>
-                        <span>{{ worker.location }} · స్థానం</span>
+            <h2 class="mt-4 text-xl font-semibold">{{ help_modal.title }}</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ help_modal.body }}</p>
+            <button type="button" class="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary/90" onclick="closeWorkerModal()">
+                <span class="material-symbols-outlined text-sm text-white">check</span>
+                <span>{{ translate('Got it', 'అర్థమైంది') }}</span>
+            </button>
+        </div>
+    </div>
+    <script>
+        document.body.classList.add('overflow-hidden');
+        function closeWorkerModal() {
+            const modal = document.getElementById('help-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+    </script>
+    {% endif %}
+    <div class="relative flex min-h-screen w-full flex-col">
+        <header class="sticky top-0 z-20 border-b border-border-light bg-background-light/90 backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/90">
+            <div class="container mx-auto flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+                <div class="flex items-center gap-3 text-primary">
+                    <div class="size-8 rounded-lg bg-primary/10 p-1.5">
+                        <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold leading-tight"></h1>
+                        <p class="text-xs font-medium uppercase tracking-[0.2em] text-primary/70">{{ translate('Worker Dashboard', 'కార్మికుల డ్యాష్‌బోర్డ్') }}</p>
                     </div>
                 </div>
-                <a href="/logout" class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-[#333333] transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200">
-                    <span class="material-symbols-outlined text-2xl">logout</span>
-                </a>
+                <nav class="hidden items-center gap-6 md:flex">
+                    <a href="#available-jobs" class="text-sm font-semibold text-primary border-b-2 border-primary pb-1">{{ translate('Job Board', 'పని జాబితా') }}</a>
+                    <a href="#accepted-jobs" class="text-sm font-medium text-text-light transition hover:text-primary dark:text-text-dark dark:hover:text-primary/80">{{ translate('My Accepted Jobs', 'నా అంగీకరించిన పనులు') }}</a>
+                    <a href="#messages" class="text-sm font-medium text-text-light transition hover:text-primary dark:text-text-dark dark:hover:text-primary/80">{{ translate('Messages', 'సందేశాలు') }}</a>
+                    <a href="#worker-profile" class="text-sm font-medium text-text-light transition hover:text-primary dark:text-text-dark dark:hover:text-primary/80">{{ translate('Profile', 'ప్రొఫైల్') }}</a>
+                </nav>
+                <div class="flex items-center gap-3">
+                    <button class="relative flex size-10 items-center justify-center rounded-full bg-gray-100 text-text-light transition hover:bg-gray-200 dark:bg-card-dark dark:text-text-dark dark:hover:bg-border-dark" title="{{ translate('Volunteer messages', 'సేవకుల సందేశాలు') }}">
+                        {% set message_count = latest_messages|length if latest_messages else 0 %}
+                        {% if message_count > 0 %}
+                            <span class="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">{{ message_count }}</span>
+                        {% endif %}
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <div class="hidden min-w-[120px] text-right text-sm font-medium text-gray-500 leading-tight sm:block dark:text-gray-300">
+                        <p class="font-semibold text-text-light dark:text-text-dark">{{ worker.name }}</p>
+                        <p>{{ worker.village|capitalize }}</p>
+                    </div>
+                    <div class="flex size-10 items-center justify-center rounded-full bg-primary text-lg font-bold text-white uppercase">
+                        {{ worker.name[:1] if worker.name else 'W' }}
+                    </div>
+                    <a href="/logout" class="inline-flex size-10 items-center justify-center rounded-full border border-border-light text-text-light transition hover:bg-border-light/40 dark:border-border-dark dark:text-text-dark dark:hover:bg-border-dark/40" title="{{ translate('Logout', 'లాగ్ అవుట్') }}">
+                        <span class="material-symbols-outlined text-[22px]">logout</span>
+                    </a>
+                </div>
             </div>
         </header>
-
-        <main class="flex-1 pb-24">
-            <section class="space-y-6 px-4 py-6">
+        <main class="flex-1">
+            <div class="container mx-auto flex flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
-                        {% for category, msg in messages %}
-                            <div class="rounded-xl border border-primary/20 bg-white/90 p-4 text-sm text-[#333333] shadow dark:border-primary/30 dark:bg-gray-800 dark:text-gray-100">
-                                <div class="flex items-start gap-3">
+                        <div class="space-y-3">
+                            {% for category, msg in messages %}
+                                <div class="flex items-start gap-3 rounded-lg border border-border-light bg-card-light px-4 py-3 text-sm shadow-sm dark:border-border-dark dark:bg-card-dark">
                                     <span class="material-symbols-outlined text-primary">info</span>
                                     <div>
-                                        <p class="font-semibold text-primary">{{ category|capitalize }}</p>
-                                        <p class="mt-1">{{ msg }}</p>
+                                        <p class="font-semibold text-primary">{{ flash_labels.get(category, flash_default) }}</p>
+                                        <p class="text-text-light dark:text-text-dark/80">{{ msg }}</p>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     {% endif %}
                 {% endwith %}
                 {% if message %}
-                    <div class="rounded-xl border border-primary/20 bg-white/90 p-4 text-sm text-[#333333] shadow dark:border-primary/30 dark:bg-gray-800 dark:text-gray-100">
-                        <div class="flex items-start gap-3">
-                            <span class="material-symbols-outlined text-primary">info</span>
-                            <div>
-                                <p class="font-semibold text-primary">{{ message_type|default('Notice')|capitalize }}</p>
-                                <p class="mt-1">{{ message }}</p>
-                            </div>
+                    <div class="flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-text-light shadow-sm dark:border-primary/40 dark:bg-primary/10 dark:text-text-dark">
+                        <span class="material-symbols-outlined text-primary">info</span>
+                        <div>
+                            <p class="font-semibold text-primary">{{ flash_labels.get(message_type, flash_default) }}</p>
+                            <p>{{ message }}</p>
                         </div>
                     </div>
                 {% endif %}
-
-                <div class="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm dark:bg-gray-900">
-                    <form method="POST" action="/worker" class="flex flex-col gap-3 md:flex-row">
-                        <input type="hidden" name="action" value="fetch_tasks">
-                        <label class="flex h-12 w-full flex-col">
-                            <div class="flex h-full items-center overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-                                <span class="flex h-full w-12 items-center justify-center text-gray-400 dark:text-gray-500">
-                                    <span class="material-symbols-outlined">search</span>
-                                </span>
-                                <span class="px-3 text-sm text-gray-500 dark:text-gray-400">{{ worker.village|capitalize }} · {{ worker.phone }}</span>
+                <div class="flex flex-col gap-8 lg:flex-row">
+                    <section id="available-jobs" class="w-full lg:w-3/5 flex flex-col gap-6">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-primary/70">{{ translate('Opportunities nearby', 'సమీప అవకాశాలు') }}</p>
+                                <h2 class="text-4xl font-black leading-tight tracking-[-0.03em] text-text-light dark:text-text-dark">{{ translate('Available Jobs', 'అందుబాటులో ఉన్న పనులు') }}</h2>
                             </div>
-                        </label>
-                        <button type="submit" class="flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 font-semibold text-white shadow hover:bg-primary-dark">
-                            <span class="material-symbols-outlined text-white">refresh</span>
-                            <span>Fetch Nearby Tasks / సమీప పనులను పొందండి</span>
-                        </button>
-                        <a href="{{ url_for('worker_help') }}" class="flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-primary px-4 font-semibold text-primary transition hover:bg-primary/10 dark:border-primary/60 dark:text-primary">
-                            <span class="material-symbols-outlined text-primary">volunteer_activism</span>
-                            <span>Ask Volunteer / సేవక సహాయం కోరండి</span>
-                        </a>
-                    </form>
-                </div>
-
-                <section class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-[#333333] dark:text-gray-100">Nearby Tasks / సమీప పనులు</h2>
-                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Updated daily / ప్రతి రోజు నవీకరణ</span>
-                    </div>
-                    {% if nearby_tasks %}
-                        <div class="grid gap-4">
-                            {% for task in nearby_tasks %}
-                                <article class="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
-                                    <header class="flex items-start justify-between gap-4">
-                                        <div>
-                                            <h3 class="text-lg font-semibold text-[#333333] dark:text-gray-100">{{ task.task }}</h3>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ task.location }}</p>
-                                        </div>
-                                        <div class="flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-primary dark:bg-primary/20">
-                                            <span class="material-symbols-outlined !text-[18px]">currency_rupee</span>
-                                            <p class="text-xs font-bold">₹{{ task.wage }}/day</p>
-                                        </div>
-                                    </header>
-                                    <dl class="grid gap-2 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-2">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">location_on</span>
-                                            <span>{{ task.distance_km if task.distance_km is not none else '—' }} km / కి.మీ దూరం</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">group</span>
-                                            <span>{{ task.num_workers }} workers needed / కావలసిన కార్మికులు</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">calendar_today</span>
-                                            <span>{{ task.created_at | timestamp_to_datetime }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5 sm:col-span-2">
-                                            <span class="material-symbols-outlined !text-base text-primary">info</span>
-                                            <span>{{ task.description or 'No description provided' }} / వివరణ లేదు</span>
-                                        </div>
-                                    </dl>
-                                    <div class="flex flex-wrap gap-3 pt-2">
-                                        {% set task_village = task.village if task.village else (task.location.split(',')[0] if task.location else '') %}
-                                        <a href="{{ url_for('worker_help', village=(task_village or '')|lower, task_name=task.task, task_wage=task.wage, task_location=task.location, task_id=task._id|string) }}"
-                                           class="inline-flex items-center gap-2 rounded-xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10 dark:border-primary/60 dark:text-primary">
-                                            <span class="material-symbols-outlined !text-base">support_agent</span>
-                                            <span>Need Volunteer Help / సేవక సహాయం కావాలి</span>
-                                        </a>
-                                        <form method="POST" action="/worker">
-                                            <input type="hidden" name="task_id" value="{{ task._id|string }}">
-                                            <button name="action" value="accept" type="submit"
-                                                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
-                                                <span class="material-symbols-outlined !text-base text-white">check_circle</span>
-                                                <span>Accept Task / పని అంగీకరించండి</span>
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="/worker">
-                                            <input type="hidden" name="task_id" value="{{ task._id|string }}">
-                                            <button name="action" value="deny" type="submit"
-                                                    class="inline-flex items-center gap-2 rounded-xl border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400 dark:text-red-300">
-                                                <span class="material-symbols-outlined !text-base">cancel</span>
-                                                <span>Deny / తిరస్కరించండి</span>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </article>
-                            {% endfor %}
+                            <a href="#task-map" class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-text-light transition hover:bg-gray-200 dark:bg-card-dark dark:text-text-dark dark:hover:bg-border-dark lg:hidden">
+                                <span class="material-symbols-outlined text-xl">map</span>
+                                <span>{{ translate('View Map', 'పటాన్ని చూడండి') }}</span>
+                            </a>
                         </div>
-                    {% else %}
-                        <div class="rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-gray-500 shadow dark:border-primary/40 dark:bg-gray-900 dark:text-gray-300">
-                            No nearby tasks yet. Fetch again in a few minutes or reach out to a volunteer. / సమీప పనులు లేవు. కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి లేదా సేవకుని సంప్రదించండి.
-                        </div>
-                    {% endif %}
-                </section>
-
-                {% if latest_messages %}
-                <section class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-[#333333] dark:text-gray-100">Volunteer Messages / సేవకుల సందేశాలు</h2>
-                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">English • తెలుగు</span>
-                    </div>
-                    <div class="grid gap-4">
-                        {% for msg in latest_messages %}
-                            <article class="rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-gray-900">
-                                <header class="flex items-start justify-between gap-3">
-                                    <div>
-                                        <h3 class="text-sm font-semibold text-primary">{{ (msg.message_en|default('')).split('\n')[0] or 'Volunteer update' }}</h3>
-                                        <time class="text-xs text-gray-500 dark:text-gray-400">{{ msg.created_at | timestamp_to_datetime }}</time>
+                        {% set wage_values = nearby_tasks | map(attribute='wage') | list if nearby_tasks else [] %}
+                        {% set min_wage = wage_values|min if wage_values else None %}
+                        {% set max_wage = wage_values|max if wage_values else None %}
+                        <div class="flex flex-col gap-4 rounded-xl border border-border-light bg-card-light p-4 shadow-sm dark:border-border-dark dark:bg-card-dark">
+                            <form method="POST" action="/worker" class="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+                                <input type="hidden" name="action" value="fetch_tasks">
+                                <label class="flex h-12 w-full flex-1">
+                                    <div class="flex w-full items-center overflow-hidden rounded-lg border border-transparent bg-gray-100 dark:bg-background-dark">
+                                        <span class="flex h-full w-12 items-center justify-center text-gray-500 dark:text-gray-300">
+                                            <span class="material-symbols-outlined">search</span>
+                                        </span>
+                                        <input readonly class="h-full w-full border-none bg-inherit text-base font-medium text-text-light focus:outline-none dark:text-text-dark" value="{{ worker.village|capitalize }} • {{ worker.phone or translate('Phone not provided', 'ఫోన్ ఇవ్వలేదు') }}">
                                     </div>
-                                    <form method="POST" action="/worker" class="shrink-0">
-                                        <input type="hidden" name="action" value="delete_notification">
-                                        <input type="hidden" name="notification_id" value="{{ msg._id|string }}">
-                                        <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-200 text-red-500 transition hover:bg-red-50 dark:border-red-400/40 dark:text-red-300 dark:hover:bg-red-500/10" title="Delete notification / నోటిఫికేషన్ తొలగించండి">
-                                            <span class="material-symbols-outlined text-base">delete</span>
-                                        </button>
-                                    </form>
-                                </header>
-                                <div class="mt-3 grid gap-2 text-sm">
-                                    {% if msg.message_en %}
-                                        <pre class="whitespace-pre-wrap rounded-xl bg-gray-100 p-3 text-[#333333] dark:bg-gray-800 dark:text-gray-100">{{ msg.message_en }}</pre>
+                                </label>
+                                <button type="submit" class="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white transition hover:bg-primary/90">
+                                    <span class="material-symbols-outlined text-base text-white">refresh</span>
+                                    <span>{{ translate('Refresh nearby jobs', 'సమీప పనులను నవీకరించండి') }}</span>
+                                </button>
+                            </form>
+                            <div class="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+                                <button class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary/10 px-3 text-sm font-semibold text-primary">{{ translate('All', 'అన్నీ') }}</button>
+                                <button class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-card-dark dark:text-text-dark dark:hover:bg-border-dark">
+                                    <span class="material-symbols-outlined text-xl text-primary">agriculture</span>
+                                    <span>{{ translate('Harvesting', 'కోత') }}</span>
+                                </button>
+                                <button class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-card-dark dark:text-text-dark dark:hover:bg-border-dark">
+                                    <span class="material-symbols-outlined text-xl text-primary">eco</span>
+                                    <span>{{ translate('Planting', 'నాటడం') }}</span>
+                                </button>
+                                <button class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-card-dark dark:text-text-dark dark:hover:bg-border-dark">
+                                    <span class="material-symbols-outlined text-xl text-primary">grass</span>
+                                    <span>{{ translate('Weeding', 'కలుపు తొలగింపు') }}</span>
+                                </button>
+                                <button class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-card-dark dark:text-text-dark dark:hover:bg-border-dark">
+                                    <span class="material-symbols-outlined text-xl text-primary">water_drop</span>
+                                    <span>{{ translate('Irrigation', 'నీరుపారుదల') }}</span>
+                                </button>
+                            </div>
+                            <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-300">{{ translate('Wage per day range', 'రోజుకు కూలీ పరిధి') }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ translate('Based on the latest jobs around you', 'మీ చుట్టూ ఉన్న తాజా పనుల ఆధారంగా') }}</p>
+                                </div>
+                                <div class="flex h-[38px] w-full pt-1.5 sm:w-72">
+                                    <div class="flex h-1.5 w-full items-center rounded-full bg-gray-200 dark:bg-border-dark">
+                                        <div class="relative h-full w-full" style="margin-left: 0%; margin-right: 0%;">
+                                            <div class="absolute inset-0 h-full rounded-full bg-primary"></div>
+                                            <div class="absolute -left-2 -top-2 flex flex-col items-center gap-1.5">
+                                                <div class="size-5 rounded-full border-2 border-primary bg-card-light dark:bg-text-dark"></div>
+                                                <p class="text-sm font-medium text-gray-600 dark:text-gray-300">₹{{ min_wage if min_wage is not none else '—' }}</p>
+                                            </div>
+                                            <div class="absolute -right-2 -top-2 flex flex-col items-center gap-1.5">
+                                                <div class="size-5 rounded-full border-2 border-primary bg-card-light dark:bg-text-dark"></div>
+                                                <p class="text-sm font-medium text-gray-600 dark:text-gray-300">₹{{ max_wage if max_wage is not none else '—' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form method="POST" action="/worker" class="inline-flex items-center justify-center">
+                                <input type="hidden" name="action" value="request_volunteer">
+                                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10 dark:border-primary/60">
+                                    <span class="material-symbols-outlined text-primary">volunteer_activism</span>
+                                    <span>{{ translate('Request volunteer help', 'సేవక సహాయం కోరండి') }}</span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600 dark:text-gray-400">
+                            <p>{{ translate('Showing', 'ప్రదర్శిస్తోంది') }} {{ nearby_tasks|length }} {{ translate('jobs', 'పనులు') }}</p>
+                            <div class="flex items-center gap-2">
+                                <label for="sort-jobs" class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ translate('Sort by', 'క్రమబద్ధీకరించు') }}:</label>
+                                <select id="sort-jobs" disabled class="block rounded-lg border border-border-light bg-card-light px-3 py-2 text-sm text-gray-600 dark:border-border-dark dark:bg-card-dark dark:text-gray-300">
+                                    <option>{{ translate('Nearest first', 'మొదట సమీపం') }}</option>
+                                    <option>{{ translate('Highest paying', 'అత్యధిక వేతనం') }}</option>
+                                    <option>{{ translate('Soonest start date', 'త్వరలో ప్రారంభం') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            {% if nearby_tasks %}
+                                {% for task in nearby_tasks %}
+                                    {% set required = task.num_workers if task.num_workers is not none else 1 %}
+                                    {% set accepted = task.accepted_workers|length if task.accepted_workers else 0 %}
+                                    {% set remaining = required - accepted %}
+                                    {% if remaining < 0 %}
+                                        {% set remaining = 0 %}
                                     {% endif %}
-                                    {% if msg.message_te %}
-                                        <pre class="whitespace-pre-wrap rounded-xl bg-primary/10 p-3 text-primary dark:bg-primary/20">{{ msg.message_te }}</pre>
+                                    {% set task_village = task.village if task.village else (task.location.split(',')[0] if task.location else '') %}
+                                    <article class="flex flex-col gap-4 rounded-xl border border-border-light bg-card-light p-4 shadow-sm transition hover:shadow-lg dark:border-border-dark dark:bg-card-dark">
+                                        <header class="flex items-start justify-between gap-4">
+                                            <div>
+                                                <h3 class="text-lg font-bold text-text-light dark:text-text-dark">{{ task.task }}</h3>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ task.location }}</p>
+                                            </div>
+                                            <div class="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary dark:bg-primary/20">
+                                                <span class="material-symbols-outlined text-xl">groups</span>
+                                                <span>
+                                                    {% if required %}
+                                                        {{ translate(remaining ~ ' spots left', remaining ~ ' ఖాళీలు మిగిలి ఉన్నాయి') }}
+                                                    {% else %}
+                                                        {{ translate('Open', 'ఖాళీ') }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </header>
+                                        <dl class="grid gap-x-4 gap-y-3 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-2">
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-base text-primary">calendar_today</span>
+                                                <span>{{ translate('Posted', 'పోస్ట్ చేసిన సమయం') }} · {{ task.created_at | timestamp_to_datetime }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-base text-primary">payments</span>
+                                                <span>₹{{ task.wage }} {{ translate('per day', 'రోజుకు') }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-base text-primary">location_on</span>
+                                                <span>{{ task.location }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-base text-primary">social_distance</span>
+                                                <span>
+                                                    {% if task.distance_km %}
+                                                        {{ translate(task.distance_km ~ ' km away', task.distance_km ~ ' కి.మీ దూరంలో') }}
+                                                    {% else %}
+                                                        {{ translate('Distance not available', 'దూరం అందుబాటులో లేదు') }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="sm:col-span-2 flex items-start gap-2">
+                                                <span class="material-symbols-outlined text-base text-primary">notes</span>
+                                                <span>{{ task.description or translate('No description provided', 'వివరణ ఇవ్వబడలేదు') }}</span>
+                                            </div>
+                                        </dl>
+                                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 font-semibold dark:bg-border-dark/40">{{ translate('Village', 'గ్రామం') }}: {{ task_village|capitalize }}</span>
+                                            {% if task.coordinates and task.coordinates.coordinates %}
+                                                {% set coords = task.coordinates.coordinates %}
+                                                <a href="https://www.google.com/maps/search/?api=1&query={{ coords[1] }},{{ coords[0] }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 font-semibold text-primary transition hover:bg-primary/10 dark:bg-border-dark/40 dark:text-primary">
+                                                    <span class="material-symbols-outlined text-sm">map</span>{{ translate('Open in Maps', 'మ్యాప్‌లో తెరవండి') }}
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex flex-col gap-3 pt-2 sm:flex-row">
+                                            <form method="POST" action="/worker" class="flex-1">
+                                                <input type="hidden" name="action" value="request_volunteer">
+                                                <input type="hidden" name="task_id" value="{{ task._id|string }}">
+                                                <input type="hidden" name="task_name" value="{{ task.task }}">
+                                                <input type="hidden" name="task_wage" value="{{ task.wage }}">
+                                                <input type="hidden" name="task_location" value="{{ task.location }}">
+                                                <input type="hidden" name="task_village" value="{{ (task_village or '')|lower }}">
+                                                <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10 dark:border-primary/60">
+                                                    <span class="material-symbols-outlined text-base">support_agent</span>
+                                                    <span>{{ translate('Need volunteer help', 'సేవక సహాయం కావాలి') }}</span>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="/worker" class="flex-1">
+                                                <input type="hidden" name="task_id" value="{{ task._id|string }}">
+                                                <button name="action" value="accept" type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90">
+                                                    <span class="material-symbols-outlined text-base text-white">check_circle</span>
+                                                    <span>{{ translate('Accept task', 'పని అంగీకరించండి') }}</span>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="/worker" class="flex-1">
+                                                <input type="hidden" name="task_id" value="{{ task._id|string }}">
+                                                <button name="action" value="deny" type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400 dark:text-red-300 dark:hover:bg-red-500/10">
+                                                    <span class="material-symbols-outlined text-base">cancel</span>
+                                                    <span>{{ translate('Decline', 'తిరస్కరించండి') }}</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            {% else %}
+                                <div class="rounded-xl border border-dashed border-primary/30 bg-card-light p-6 text-center text-sm text-gray-600 shadow-sm dark:border-primary/40 dark:bg-card-dark dark:text-gray-300">
+                                    {{ translate('No nearby tasks yet. Fetch again in a few minutes or reach out to a volunteer.', 'సమీప పనులు లేవు. కొద్దిసేపటి తరువాత మళ్లీ ప్రయత్నించండి లేదా సేవకున్ని సంప్రదించండి.') }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <section id="accepted-jobs" class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-2xl font-semibold text-text-light dark:text-text-dark">{{ translate('My Accepted Jobs', 'నా అంగీకరించిన పనులు') }}</h3>
+                                <span class="text-xs uppercase tracking-[0.3em] text-gray-500 dark:text-gray-400">{{ translate('Progress', 'పురోగతి') }}</span>
+                            </div>
+                            {% if accepted_tasks %}
+                                <div class="grid gap-4">
+                                    {% for task in accepted_tasks %}
+                                        {% set assignment = task.assignment_status or {} %}
+                                        <article class="rounded-xl border border-border-light bg-card-light p-4 shadow-sm dark:border-border-dark dark:bg-card-dark">
+                                            <header class="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <h4 class="text-lg font-semibold text-text-light dark:text-text-dark">{{ task.task }}</h4>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ task.location }}</p>
+                                                </div>
+                                                <span class="inline-flex items-center gap-1.5 rounded-full {% if task.completed %}bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200{% else %}bg-accent/10 text-accent dark:bg-accent/20{% endif %} px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                                                    {{ translate('Completed', 'పూర్తయింది') if task.completed else translate('In progress', 'పనిలో ఉంది') }}
+                                                </span>
+                                            </header>
+                                            <dl class="mt-3 grid gap-3 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-2">
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="material-symbols-outlined text-base text-primary">group</span>
+                                                    {% set worker_count = task.num_workers if task.num_workers is not none else 0 %}
+                                                    <span>{{ translate(worker_count ~ ' workers', worker_count ~ ' కార్మికులు') }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="material-symbols-outlined text-base text-primary">currency_rupee</span>
+                                                    <span>₹{{ task.wage }} {{ translate('per day', 'రోజుకు') }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="material-symbols-outlined text-base text-primary">badge</span>
+                                                    <span>{{ task.accepter_name }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="material-symbols-outlined text-base text-primary">schedule</span>
+                                                    <span>{{ task.created_at | timestamp_to_datetime }}</span>
+                                                </div>
+                                            </dl>
+                                            <div class="mt-3 flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                {% if assignment.confirmed %}
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-200">
+                                                        <span class="material-symbols-outlined text-sm">verified</span>{{ translate('Confirmed by farmer', 'రైతు ధృవీకరించాడు') }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-600 dark:bg-border-dark/40 dark:text-gray-200">
+                                                        <span class="material-symbols-outlined text-sm">hourglass_empty</span>{{ translate('Awaiting confirmation', 'ధృవీకరణ కోసం వేచి ఉంది') }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if assignment.arrived %}
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-200">
+                                                        <span class="material-symbols-outlined text-sm">where_to_vote</span>{{ translate('Arrival recorded', 'రాక నమోదైంది') }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if assignment.paid %}
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">
+                                                        <span class="material-symbols-outlined text-sm">currency_rupee</span>{{ translate('Paid offline', 'ఆఫ్లైన్‌లో చెల్లింపు జరిగింది') }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if assignment.rating %}
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary">
+                                                        <span class="material-symbols-outlined text-sm">grade</span>{{ translate('Farmer rating', 'రైతు రేటింగ్') }}: {{ assignment.rating }}/5
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+                                                {% if not task.completed %}
+                                                    <form method="POST" action="/worker" class="sm:flex-1">
+                                                        <input type="hidden" name="task_id" value="{{ task._id|string }}">
+                                                        <button name="action" value="complete" type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90">
+                                                            <span class="material-symbols-outlined text-base text-white">task_alt</span>
+                                                            <span>{{ translate('Mark as complete', 'పూర్తయిందిగా గుర్తించండి') }}</span>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                <form method="POST" action="/worker" class="sm:flex-1">
+                                                    <input type="hidden" name="task_id" value="{{ task._id|string }}">
+                                                    <button name="action" value="deny" type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50 dark:border-red-400 dark:text-red-300 dark:hover:bg-red-500/10">
+                                                        <span class="material-symbols-outlined text-base">delete</span>
+                                                        <span>{{ translate('Remove task', 'పనిని తొలగించండి') }}</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </article>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="rounded-xl border border-dashed border-primary/30 bg-card-light p-6 text-center text-sm text-gray-600 shadow-sm dark:border-primary/40 dark:bg-card-dark dark:text-gray-300">
+                                    {{ translate('You have not accepted any tasks yet.', 'మీరు ఇంకా ఏ పనినీ అంగీకరించలేదు.') }}
+                                </div>
+                            {% endif %}
+                        </section>
+                        {% if completed_tasks %}
+                        <section class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-2xl font-semibold text-text-light dark:text-text-dark">{{ translate('Recent completions', 'ఇటీవలి పూర్తి చేసిన పనులు') }}</h3>
+                                <span class="text-xs uppercase tracking-[0.3em] text-gray-500 dark:text-gray-400">{{ translate('Thank you for your work', 'మీ పనికి ధన్యవాదాలు') }}</span>
+                            </div>
+                            <div class="grid gap-4">
+                                {% for task in completed_tasks %}
+                                    {% set status = task.assignment_status or {} %}
+                                    <article class="rounded-xl border border-border-light bg-card-light p-4 shadow-sm dark:border-border-dark dark:bg-card-dark">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div>
+                                                <h4 class="text-lg font-semibold text-text-light dark:text-text-dark">{{ task.task }}</h4>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ task.location }}</p>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-200">
+                                                <span class="material-symbols-outlined text-sm">task_alt</span>{{ translate('Completed', 'పూర్తయింది') }}
+                                            </span>
+                                        </div>
+                                        <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-primary">schedule</span>{{ task.completed_at | timestamp_to_datetime if task.completed_at else '' }}
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-primary">currency_rupee</span>₹{{ task.wage }} {{ translate('per day', 'రోజుకు') }}
+                                            </span>
+                                            {% if status.rating %}
+                                                <span class="inline-flex items-center gap-1">
+                                                    <span class="material-symbols-outlined text-primary">grade</span>{{ translate('Rating', 'రేటింగ్') }}: {{ status.rating }}/5
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endif %}
+                        {% if latest_messages %}
+                        <section id="messages" class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-2xl font-semibold text-text-light dark:text-text-dark">{{ translate('Volunteer messages', 'సేవకుల సందేశాలు') }}</h3>
+                                <span class="text-xs uppercase tracking-[0.3em] text-gray-500 dark:text-gray-400">{{ translate('Latest updates', 'తాజా నవీకరణలు') }}</span>
+                            </div>
+                            <div class="grid gap-4">
+                                {% for msg in latest_messages %}
+                                    {% set primary_message = msg.message_en if lang != 'te' else msg.message_te %}
+                                    {% set fallback_message = msg.message_te if lang != 'te' else msg.message_en %}
+                                    {% set raw_heading = primary_message or fallback_message or '' %}
+                                    <article class="rounded-xl border border-border-light bg-card-light p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-border-dark dark:bg-card-dark">
+                                        <header class="flex items-start justify-between gap-3">
+                                            <div>
+                                                <h4 class="text-sm font-semibold text-primary">{{ raw_heading.split('\n')[0] if raw_heading else translate('Volunteer update', 'సేవకుల నవీకరణ') }}</h4>
+                                                <time class="text-xs text-gray-500 dark:text-gray-400">{{ msg.created_at | timestamp_to_datetime }}</time>
+                                            </div>
+                                            <form method="POST" action="/worker" class="shrink-0">
+                                                <input type="hidden" name="action" value="delete_notification">
+                                                <input type="hidden" name="notification_id" value="{{ msg._id|string }}">
+                                                <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-200 text-red-500 transition hover:bg-red-50 dark:border-red-400/40 dark:text-red-300 dark:hover:bg-red-500/10" title="{{ translate('Delete notification', 'అధిసూచన తొలగించండి') }}">
+                                                    <span class="material-symbols-outlined text-base">delete</span>
+                                                </button>
+                                            </form>
+                                        </header>
+                                        <div class="mt-3 grid gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                            {% if primary_message %}
+                                                <pre class="whitespace-pre-wrap rounded-lg bg-gray-100 p-3 text-text-light dark:bg-border-dark/40 dark:text-text-dark">{{ primary_message }}</pre>
+                                            {% elif fallback_message %}
+                                                <pre class="whitespace-pre-wrap rounded-lg bg-gray-100 p-3 text-text-light dark:bg-border-dark/40 dark:text-text-dark">{{ fallback_message }}</pre>
+                                            {% endif %}
+                                        </div>
+                                        {% if msg.volunteer_phone %}
+                                            <a href="tel:{{ msg.volunteer_phone }}" class="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90">
+                                                <span class="material-symbols-outlined text-base text-white">call</span>
+                                                <span>{{ translate('Call volunteer', 'సేవకున్ని కాల్ చేయండి') }}</span>
+                                            </a>
+                                        {% endif %}
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endif %}
+                    </section>
+                    <aside class="w-full lg:w-2/5 space-y-6 lg:sticky lg:top-32" id="worker-profile">
+                        <div class="rounded-xl border border-border-light bg-card-light p-6 shadow-sm dark:border-border-dark dark:bg-card-dark">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <p class="text-xs uppercase tracking-[0.3em] text-primary/70">{{ translate('Worker profile', 'కార్మిక ప్రొఫైల్') }}</p>
+                                    <h3 class="text-2xl font-bold text-text-light dark:text-text-dark">{{ worker.name }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ worker.location }}</p>
+                                </div>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary dark:bg-primary/20">
+                                    <span class="material-symbols-outlined text-sm">verified_user</span>{{ translate('Active', 'సక్రియంగా') }}
+                                </span>
+                            </div>
+                            <dl class="mt-6 grid gap-3 text-sm text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">location_on</span>{{ worker.village|capitalize }}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ translate('Village', 'గ్రామం') }}</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">call</span>{{ worker.phone or translate('Phone not provided', 'ఫోన్ ఇవ్వలేదు') }}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ translate('Contact', 'సంప్రదింపు') }}</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">payments</span>
+                                        {% if worker.preferred_wage %}
+                                            ₹{{ '%.0f'|format(worker.preferred_wage) }} / {{ translate('day', 'రోజు') }}
+                                        {% else %}
+                                            {{ translate('Not set', 'సెట్ చేయలేదు') }}
+                                        {% endif %}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ translate('Preferred wage', 'ఇష్టమైన వేతనం') }}</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">schedule</span>
+                                        {% if worker.availability == 'full_time' %}
+                                            {{ translate('Full day', 'పూర్తి రోజు') }}
+                                        {% elif worker.availability == 'half_day' %}
+                                            {{ translate('Half day', 'అర రోజు') }}
+                                        {% elif worker.availability == 'weekends' %}
+                                            {{ translate('Weekends', 'వారాంతాలు') }}
+                                        {% elif worker.availability == 'seasonal' %}
+                                            {{ translate('Seasonal / on call', 'రుతుపవన / అవసరమైనప్పుడు') }}
+                                        {% else %}
+                                            {{ translate('Not set', 'సెట్ చేయలేదు') }}
+                                        {% endif %}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ translate('Availability', 'లభ్యత') }}</span>
+                                </div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">star</span>
+                                        {% if worker.rating_average %}
+                                            {{ worker.rating_average }}/5 · {{ worker.rating_count }} {{ translate('ratings', 'రేటింగ్స్') }}
+                                        {% else %}
+                                            {{ translate('No ratings yet', 'ఇంకా రేటింగ్స్ లేవు') }}
+                                        {% endif %}
+                                    </span>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ translate('Feedback', 'ప్రతిస్పందన') }}</span>
+                                </div>
+                            </dl>
+                            {% set skills = worker.skills if worker.skills else [] %}
+                            <div class="mt-6">
+                                <p class="text-xs uppercase tracking-[0.3em] text-primary/70">{{ translate('Skills', 'నైపుణ్యాలు') }}</p>
+                                {% if skills %}
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        {% for skill in skills %}
+                                            <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary dark:bg-primary/20">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ translate('No skills added yet. Contact a volunteer to update your profile.', 'ఇంకా నైపుణ్యాలు నమోదు కాలేదు. మీ ప్రొఫైల్‌ను నవీకరించడానికి సేవకునిని సంప్రదించండి.') }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="mt-6 grid gap-3 rounded-lg bg-gray-100 p-4 text-sm text-gray-700 dark:bg-border-dark/40 dark:text-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-semibold">{{ translate('Accepted tasks', 'అంగీకరించిన పనులు') }}</span>
+                                    <span class="text-primary font-bold">{{ accepted_tasks|length }}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-semibold">{{ translate('Completed tasks', 'పూర్తయిన పనులు') }}</span>
+                                    <span class="text-primary font-bold">{{ completed_tasks|length }}</span>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+                                {{ translate('Prefer to browse volunteers manually?', 'సేవకులను స్వయంగా చూసుకోవాలనుకుంటున్నారా?') }}
+                                <a href="{{ url_for('worker_help') }}" class="font-semibold text-primary hover:underline">{{ translate('Open volunteer directory', 'సేవకుల జాబితాను చూడండి') }}</a>
+                            </p>
+                        </div>
+                        <div id="task-map" class="overflow-hidden rounded-xl border border-border-light bg-card-light shadow-sm dark:border-border-dark dark:bg-card-dark">
+                            <div class="relative h-64 w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDKhjFkBbt1NmSaSd-_kRULNsuOP9adFECSSFPsHwXZe1aDABGelPLlLMG71jptblXEmkdpHxPokUkJ77Bhz_bUgcMWt5UUtkeelHAdkJlTBjSRtVIPyR-XlQReDabnGJwq1_dZO9saN-bsLBT44ApMiaSh6vkdBNEKTGxlMu8bWo21NmqflJLO8RTA0dAdxdk5sTLbbxTsULO5SUM-ldKPznfI9lk9oSN3ofpi2_HSQxqKBTD9DYEqwwz7LCvlLkj-lnC5J85H-Bc');">
+                                <div class="absolute inset-0 bg-primary/30 mix-blend-multiply"></div>
+                                <div class="absolute bottom-6 left-6 right-6 rounded-lg bg-card-light/90 p-4 text-sm text-text-light shadow dark:bg-card-dark/90 dark:text-text-dark">
+                                    <p class="font-semibold text-primary">{{ translate('Jobs around you', 'మీ చుట్టూ ఉన్న పనులు') }}</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ translate('Use the map links on each job card to navigate to the farm.', 'ప్రతి పని కార్డులోని మ్యాప్ లింక్‌ను ఉపయోగించి పొలానికి చేరుకోండి.') }}</p>
+                                    {% if nearby_tasks %}
+                                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ translate('Nearest location', 'సమీప ప్రదేశం') }}: {{ nearby_tasks[0].location }}</p>
+                                    {% else %}
+                                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ translate('Fetching tasks keeps this map updated.', 'పనులను పొందడం ఈ మ్యాప్‌ను తాజాగా ఉంచుతుంది.') }}</p>
                                     {% endif %}
                                 </div>
-                                {% if msg.volunteer_phone %}
-                                    <a href="tel:{{ msg.volunteer_phone }}" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
-                                        <span class="material-symbols-outlined !text-base text-white">call</span>
-                                        <span>Call Volunteer / సేవకునికి కాల్ చేయండి</span>
-                                    </a>
-                                {% endif %}
-                            </article>
-                        {% endfor %}
-                    </div>
-                </section>
-                {% endif %}
-
-                <section class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-[#333333] dark:text-gray-100">Accepted Tasks</h2>
-                        <span class="text-xs uppercase tracking-[0.35em] text-gray-500 dark:text-gray-500">Progress / పురోగతి</span>
-                    </div>
-                    {% if accepted_tasks %}
-                        <div class="grid gap-4">
-                            {% for task in accepted_tasks %}
-                                <article class="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-900">
-                                    <header class="flex items-start justify-between gap-4">
-                                        <div>
-                                            <h3 class="text-lg font-semibold text-[#333333] dark:text-gray-100">{{ task.task }}</h3>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ task.location }}</p>
-                                        </div>
-                                        <span class="inline-flex items-center gap-1.5 rounded-full {{ 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200' if task.completed else 'bg-accent/10 text-accent dark:bg-accent/20' }} px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-                                            {{ 'Completed' if task.completed else 'In Progress' }}
-                                        </span>
-                                    </header>
-                                    <dl class="mt-3 grid gap-2 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-2">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">group</span>
-                                            <span>{{ task.num_workers }} workers / కార్మికులు</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">currency_rupee</span>
-                                            <span>₹{{ task.wage }} / day · రోజుకు</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">badge</span>
-                                            <span>{{ task.accepter_name }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="material-symbols-outlined !text-base text-primary">schedule</span>
-                                            <span>{{ task.created_at | timestamp_to_datetime }}</span>
-                                        </div>
-                                    </dl>
-                                    {% if not task.completed %}
-                                        <form method="POST" action="/worker" class="mt-4">
-                                            <input type="hidden" name="task_id" value="{{ task._id|string }}">
-                                            <button name="action" value="complete" type="submit"
-                                                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark">
-                                            <span class="material-symbols-outlined !text-base text-white">task_alt</span>
-                                            <span>Mark as Complete / పూర్తయిందిగా గుర్తించండి</span>
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                </article>
-                            {% endfor %}
+                            </div>
                         </div>
-                    {% else %}
-                        <div class="rounded-2xl border border-dashed border-primary/30 bg-white p-6 text-center text-sm text-gray-500 shadow dark:border-primary/40 dark:bg-gray-900 dark:text-gray-300">
-                            You have not accepted any tasks yet. / మీరు ఇంకా ఏ పనినీ అంగీకరించలేదు.
-                        </div>
-                    {% endif %}
-                </section>
-            </section>
+                    </aside>
+                </div>
+            </div>
         </main>
     </div>
 </body>

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 
-<html class="light" lang="te"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>గ్రామీణ శ్రామిక వేదిక</title>
+<title>Rural Labor Marketplace</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -21,7 +20,7 @@
                         "text-dark": "#fafcf8",
                     },
                     fontFamily: {
-                        "display": ["Public Sans", "Noto Sans Telugu", "sans-serif"]
+                        "display": ["Public Sans", "Noto Sans", "sans-serif"]
                     },
                     borderRadius: {
                         "DEFAULT": "0.5rem",
@@ -49,54 +48,53 @@
     body {
       margin: 0;
       overflow: hidden;
-      font-family: 'Noto Sans Telugu', 'Public Sans', sans-serif;
     }
   </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
 <div class="relative flex h-full w-full flex-col overflow-hidden">
 <div class="absolute inset-0 z-0 pointer-events-none">
-<div class="w-full h-full bg-center bg-no-repeat bg-cover aspect-auto" data-alt="సుసంపన్నమైన పల్లె వ్యవసాయ దృశ్యం." style='background: linear-gradient(135deg, rgba(36,99,18,0.45), rgba(145,185,82,0.35)), url("{{ url_for('static', filename='landing_bg.jpg') }}") center/cover no-repeat; opacity: 0.25;'></div>
+<div class="w-full h-full bg-center bg-no-repeat bg-cover aspect-auto" data-alt="Vibrant farm landscape with rolling green hills and a clear blue sky." style='background: linear-gradient(135deg, rgba(36,99,18,0.45), rgba(145,185,82,0.35)), url("{{ url_for('static', filename='landing_bg.jpg') }}") center/cover no-repeat; opacity: 0.25;'></div>
 </div>
 <div class="relative z-10 flex flex-col items-center justify-center flex-grow px-4 py-8">
 <div class="mb-6 w-full max-w-sm text-left">
     <a href="/" class="inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-white/80 px-4 py-2 text-sm font-semibold text-primary shadow hover:bg-white">
         <span class="material-symbols-outlined !text-base">language</span>
-        <span>భాషను మార్చండి</span>
+        <span>Choose Language</span>
     </a>
 </div>
 <div class="flex items-center gap-2 mb-8">
 <span class="material-symbols-outlined text-primary" style="font-size: 36px;">grass</span>
-<span class="text-2xl font-bold">అగ్రి కనెక్ట్</span>
+                <span class="text-2xl font-bold"></span>
 </div>
-<h1 class="tracking-light text-[30px] font-bold leading-tight text-center pb-3 pt-6">స్వాగతం! మీరు ఎలా ప్రారంభించాలనుకుంటున్నారు?</h1>
+<h1 class="text-text-light dark:text-text-dark tracking-light text-[32px] font-bold leading-tight text-center pb-3 pt-6">Welcome! How would you like to get started?</h1>
 <div class="w-full max-w-md mt-8 space-y-6">
 <div>
 <button class="w-full flex items-center justify-center gap-3 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-lg h-16 px-5 bg-primary text-text-dark text-lg font-bold leading-normal tracking-[0.015em]" onclick="window.location.href='{{ url_for('farmer_login') }}'">
 <span class="material-symbols-outlined">agriculture</span>
-<span class="truncate">నేను రైతిని</span>
+<span class="truncate">I'm a Farmer</span>
 </button>
-<p class="text-base font-normal leading-normal pt-2 px-4 text-center">పనులను పోస్ట్ చేసి, సహాయం చేసే కార్మికులను కనుగొనండి.</p>
+<p class="text-text-light dark:text-text-dark text-base font-normal leading-normal pt-2 px-4 text-center">Post jobs and find help for your farm.</p>
 </div>
 <div>
 <button class="w-full flex items-center justify-center gap-3 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-lg h-16 px-5 bg-[#795548] text-white text-lg font-bold leading-normal tracking-[0.015em]" onclick="window.location.href='{{ url_for('worker_login') }}'">
 <span class="material-symbols-outlined">construction</span>
-<span class="truncate">నేను కార్మికుడిని</span>
+<span class="truncate">I'm a Worker</span>
 </button>
-<p class="text-base font-normal leading-normal pt-2 px-4 text-center">మీ ప్రాంతంలో రోజువారీ పనులను వెంటనే తెలుసుకోండి.</p>
+<p class="text-text-light dark:text-text-dark text-base font-normal leading-normal pt-2 px-4 text-center">Find daily-wage work in your area.</p>
 </div>
 <div>
 <button class="w-full flex items-center justify-center gap-3 min-w-[84px] max-w-[480px] cursor-pointer overflow-hidden rounded-lg h-16 px-5 bg-[#FF9800] text-white text-lg font-bold leading-normal tracking-[0.015em]" onclick="window.location.href='{{ url_for('volunteer_login') }}'">
 <span class="material-symbols-outlined">volunteer_activism</span>
-<span class="truncate">నేను సేవకుడిని</span>
+<span class="truncate">I'm a Volunteer</span>
 </button>
-<p class="text-base font-normal leading-normal pt-2 px-4 text-center">గ్రామంలో అవసరాలు తీర్చడానికి సహకారం అందించండి.</p>
+<p class="text-text-light dark:text-text-dark text-base font-normal leading-normal pt-2 px-4 text-center">Contribute your time and skills to local farms.</p>
 </div>
 </div>
 <div class="mt-12 text-center">
 <a class="inline-flex items-center gap-2 text-primary font-semibold hover:underline" href="#">
 <span class="material-symbols-outlined">help_outline</span>
-                    మరింత తెలుసుకోండి
+                    Learn More
                 </a>
 </div>
 </div>

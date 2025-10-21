@@ -55,6 +55,56 @@
                     <span>{{ farmer.village|capitalize }}</span>
                     <span>{{ farmer.phone }}</span>
                 </div>
+                <details class="relative [&_summary::-webkit-details-marker]:hidden">
+                    <summary style="list-style: none;" class="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-primary/20 text-primary transition hover:bg-primary hover:text-white">
+                        <span class="material-symbols-outlined text-lg">notifications</span>
+                        {% set notification_count = notifications|length %}
+                        {% if notification_count %}
+                            <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white">{{ notification_count }}</span>
+                        {% endif %}
+                    </summary>
+                    <div class="absolute right-0 mt-3 w-72 rounded-2xl border border-primary/20 bg-white p-4 text-sm shadow-lg shadow-primary/20 dark:border-primary/40 dark:bg-background-dark">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="text-sm font-semibold text-text-primary dark:text-white">{{ labels.notifications_title }}</h3>
+                            <form method="POST" action="/farmer">
+                                <input type="hidden" name="action" value="clear_notifications">
+                                <button type="submit" class="inline-flex items-center gap-1 rounded-full border border-primary px-2 py-1 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white">
+                                    <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                                    {{ translate('Clear', 'తొలగించండి') }}
+                                </button>
+                            </form>
+                        </div>
+                        <div class="mt-3 max-h-64 space-y-3 overflow-y-auto">
+                            {% if notifications %}
+                                {% for notification in notifications %}
+                                    <article class="rounded-xl border border-primary/15 bg-primary/5 p-3 text-text-primary dark:border-primary/30 dark:bg-white/10">
+                                        <p class="text-sm font-semibold">{{ notification.message }}</p>
+                                        <dl class="mt-2 space-y-1 text-xs text-text-secondary dark:text-gray-300">
+                                            {% if notification.task_location %}
+                                                <div class="flex justify-between gap-2">
+                                                    <span>{{ labels.notification_location }}</span>
+                                                    <span>{{ notification.task_location }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if notification.worker_phone %}
+                                                <div class="flex justify-between gap-2">
+                                                    <span>{{ labels.notification_worker_phone }}</span>
+                                                    <span>{{ notification.worker_phone }}</span>
+                                                </div>
+                                            {% endif %}
+                                            <div class="flex justify-between gap-2">
+                                                <span>{{ labels.notification_when }}</span>
+                                                <span>{{ notification.created_at | timestamp_to_datetime }}</span>
+                                            </div>
+                                        </dl>
+                                    </article>
+                                {% endfor %}
+                            {% else %}
+                                <p class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-4 text-center text-xs text-text-secondary">{{ labels.notifications_empty }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </details>
                 <form action="/logout" method="get">
                     <button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary transition hover:bg-primary hover:text-white" type="submit" title="{{ labels.logout }}">
                         <span class="material-symbols-outlined">logout</span>
@@ -231,10 +281,20 @@
                                                 <h3 class="text-lg font-semibold text-text-primary dark:text-white">{{ task.task }}</h3>
                                                 <p class="text-sm text-text-secondary">{{ task.location }}</p>
                                             </div>
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary">
-                                                <span class="inline-block h-2 w-2 rounded-full bg-primary"></span>
-                                                {{ status_labels.get(task.status or 'open', (task.status or 'open')|title) }}
-                                            </span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="inline-flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary">
+                                                    <span class="inline-block h-2 w-2 rounded-full bg-primary"></span>
+                                                    {{ status_labels.get(task.status or 'open', (task.status or 'open')|title) }}
+                                                </span>
+                                                <button type="button"
+                                                        class="inline-flex items-center gap-1 rounded-full border border-red-500 px-3 py-1 text-xs font-semibold text-red-500 transition hover:bg-red-500 hover:text-white"
+                                                        data-delete-task="true"
+                                                        data-task-id="{{ task._id|string }}"
+                                                        data-task-name="{{ task.task }}">
+                                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                                    {{ translate('Delete', 'తొలగించండి') }}
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="space-y-3 text-sm text-text-secondary">
                                             <div class="flex items-center gap-3">
@@ -259,64 +319,15 @@
                 </section>
 
                 <section class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
-                    <header class="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.notifications_kicker }}</p>
-                            <h2 class="text-xl font-semibold">{{ labels.notifications_title }}</h2>
-                        </div>
-                        <form method="POST" action="/farmer">
-                            <input type="hidden" name="action" value="fetch_notifications">
-                            <button class="flex items-center gap-2 rounded-full border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white" type="submit">
-                                <span class="material-symbols-outlined text-sm">refresh</span>
-                                {{ labels.refresh_button }}
-                            </button>
-                        </form>
-                    </header>
-                    {% if notifications %}
-                        <ul class="space-y-3 text-sm">
-                            {% for notification in notifications %}
-                                <li class="rounded-xl border border-primary/15 bg-primary/5 p-4">
-                                    <p class="font-semibold text-text-primary dark:text-white">{{ notification.message }}</p>
-                                    <dl class="mt-2 grid gap-1 text-xs text-text-secondary">
-                                        <div class="flex justify-between">
-                                            <span>{{ labels.notification_location }}</span>
-                                            <span>{{ notification.task_location }}</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span>{{ labels.notification_worker_phone }}</span>
-                                            <span>{{ notification.worker_phone or labels.notification_phone_missing }}</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span>{{ labels.notification_when }}</span>
-                                            <span>{{ notification.created_at | timestamp_to_datetime }}</span>
-                                        </div>
-                                    </dl>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <div class="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-6 text-center text-sm text-text-secondary">
-                            {{ labels.notifications_empty }}
-                        </div>
-                    {% endif %}
-                </section>
-
-                <section class="space-y-4 rounded-2xl bg-white/90 p-5 shadow-lg shadow-primary/10 dark:bg-white/5">
-                    <header class="flex flex-wrap items-center justify-between gap-3">
+                    <header class="flex flex-wrap items-start justify-between gap-3">
                         <div>
                             <p class="text-xs uppercase tracking-[0.35em] text-text-secondary/80">{{ labels.help_kicker }}</p>
                             <h2 class="text-xl font-semibold">{{ labels.help_title }}</h2>
+                            <p class="mt-2 text-sm text-text-secondary dark:text-gray-400">{{ labels.help_contact_hint }}</p>
                         </div>
-                        <form method="POST" action="/farmer">
-                            <input type="hidden" name="action" value="fetch_help_status">
-                            <button class="flex items-center gap-2 rounded-full border border-primary px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white" type="submit">
-                                <span class="material-symbols-outlined text-sm">refresh</span>
-                                {{ labels.refresh_button }}
-                            </button>
-                        </form>
                     </header>
                     {% if accepted_overview %}
-                        <ul class="space-y-3">
+                        <ul class="space-y-4">
                             {% for item in accepted_overview %}
                                 <li class="rounded-2xl border border-primary/15 bg-primary/5 p-4">
                                     <div class="flex flex-wrap items-start justify-between gap-3">
@@ -324,34 +335,110 @@
                                             <p class="text-lg font-semibold text-text-primary dark:text-white">{{ item.task }}</p>
                                             <p class="text-sm text-text-secondary">{{ item.location }}</p>
                                         </div>
-                                        <div class="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary dark:bg-white/10">
+                                        <div class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary dark:bg-white/10">
+                                            <span class="material-symbols-outlined text-sm text-primary">event_available</span>
                                             {{ status_labels.get(item.status or 'open', (item.status or 'open')|title) }}
                                         </div>
                                     </div>
-                                    <p class="mt-3 text-sm text-text-secondary">
-                                        {{ labels.help_volunteer }} <span class="font-medium text-text-primary dark:text-white">{{ item.volunteer_name }}</span> • {{ labels.help_workers_needed }} {{ item.num_workers }}
-                                    </p>
-                                    {% if item.accepted and item.accepted|length > 0 %}
-                                        <div class="mt-3 rounded-xl border border-primary/20 bg-white/80 p-3 text-sm text-text-primary shadow-sm dark:bg-white/10">
-                                            <p class="font-semibold text-primary">{{ labels.help_accepted_header }}</p>
-                                            <ul class="mt-2 grid gap-1 text-xs text-text-secondary">
-                                                {% for worker in item.accepted %}
-                                                    <li>
-                                                        <strong class="text-text-primary dark:text-white">{{ worker.name }}</strong>
-                                                        {% if worker.village %} • {{ worker.village|capitalize }}{% endif %}
-                                                        {% if worker.phone %} • {{ worker.phone }}{% endif %}
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                            <p class="mt-2 text-xs text-text-secondary">
-                                                {{ labels.help_contact_hint }}
-                                            </p>
+                                    <div class="mt-3 grid gap-2 text-sm text-text-secondary dark:text-gray-400 sm:grid-cols-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-primary">payments</span>
+                                            <span>₹{{ item.wage or 0 }} {{ translate('per day', 'రోజుకు') }}</span>
                                         </div>
-                                    {% else %}
-                                        <div class="mt-3 rounded-xl border border-primary/20 bg-white/60 p-3 text-sm text-text-secondary dark:bg-white/10">
-                                            {{ labels.help_no_workers }}
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-primary">group</span>
+                                            <span>{{ labels.help_workers_needed }} {{ item.num_workers }}</span>
                                         </div>
+                                    </div>
+                                    {% if item.volunteer_name %}
+                                        <p class="mt-2 text-xs text-primary">{{ labels.help_volunteer }} <span class="font-semibold">{{ item.volunteer_name }}</span></p>
                                     {% endif %}
+                                    <div class="mt-4 space-y-3">
+                                        {% for assignment in item.assignments %}
+                                            <article class="rounded-xl border border-primary/20 bg-white/80 p-3 text-sm text-text-primary shadow-sm dark:border-primary/30 dark:bg-white/10">
+                                                <div class="flex flex-wrap items-start justify-between gap-3">
+                                                    <div>
+                                                        <p class="font-semibold text-primary">{{ assignment.name }}</p>
+                                                        <p class="text-xs text-text-secondary">
+                                                            {% if assignment.village %}{{ assignment.village|capitalize }} • {% endif %}
+                                                            {% if assignment.phone %}{{ assignment.phone }}{% else %}{{ translate('Phone not available', 'ఫోన్ అందుబాటులో లేదు') }}{% endif %}
+                                                        </p>
+                                                    </div>
+                                                    <div class="flex flex-wrap gap-2 text-xs">
+                                                        {% if assignment.confirmed %}
+                                                            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 font-semibold text-green-700 dark:bg-green-900 dark:text-green-200">
+                                                                <span class="material-symbols-outlined text-sm">verified</span>{{ translate('Confirmed', 'ధృవీకరించబడింది') }}
+                                                            </span>
+                                                        {% else %}
+                                                            <form method="POST" action="/farmer">
+                                                                <input type="hidden" name="form_type" value="assignment_update">
+                                                                <input type="hidden" name="task_id" value="{{ item.task_id }}">
+                                                                <input type="hidden" name="worker_id" value="{{ assignment.worker_id }}">
+                                                                <input type="hidden" name="field" value="confirmed">
+                                                                <button type="submit" class="inline-flex items-center gap-1 rounded-full border border-primary px-3 py-1 font-semibold text-primary transition hover:bg-primary hover:text-white">
+                                                                    <span class="material-symbols-outlined text-sm">task_alt</span>{{ translate('Confirm worker', 'కార్మికుడిని ధృవీకరించండి') }}
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                        {% if assignment.arrived %}
+                                                            <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 font-semibold text-blue-700 dark:bg-blue-900 dark:text-blue-200">
+                                                                <span class="material-symbols-outlined text-sm">where_to_vote</span>{{ translate('Arrived', 'చేరారు') }}
+                                                            </span>
+                                                        {% else %}
+                                                            <form method="POST" action="/farmer">
+                                                                <input type="hidden" name="form_type" value="assignment_update">
+                                                                <input type="hidden" name="task_id" value="{{ item.task_id }}">
+                                                                <input type="hidden" name="worker_id" value="{{ assignment.worker_id }}">
+                                                                <input type="hidden" name="field" value="arrived">
+                                                                <button type="submit" class="inline-flex items-center gap-1 rounded-full border border-primary px-3 py-1 font-semibold text-primary transition hover:bg-primary hover:text-white">
+                                                                    <span class="material-symbols-outlined text-sm">beenhere</span>{{ translate('Mark arrived', 'చేరినట్టు గుర్తించండి') }}
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                        {% if assignment.paid %}
+                                                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-700 dark:bg-amber-900 dark:text-amber-200">
+                                                                <span class="material-symbols-outlined text-sm">currency_rupee</span>{{ translate('Paid', 'చెల్లింపు జరిగింది') }}
+                                                            </span>
+                                                        {% else %}
+                                                            <form method="POST" action="/farmer">
+                                                                <input type="hidden" name="form_type" value="assignment_update">
+                                                                <input type="hidden" name="task_id" value="{{ item.task_id }}">
+                                                                <input type="hidden" name="worker_id" value="{{ assignment.worker_id }}">
+                                                                <input type="hidden" name="field" value="paid">
+                                                                <button type="submit" class="inline-flex items-center gap-1 rounded-full border border-primary px-3 py-1 font-semibold text-primary transition hover:bg-primary hover:text-white">
+                                                                    <span class="material-symbols-outlined text-sm">payments</span>{{ translate('Mark paid', 'చెల్లింపు నమోదుచేయండి') }}
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-text-secondary dark:text-gray-400">
+                                                    {% if assignment.rating %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary">
+                                                            <span class="material-symbols-outlined text-sm">grade</span>{{ translate('Rated', 'రేట్ చేయబడింది') }}: {{ assignment.rating }}/5
+                                                        </span>
+                                                    {% elif assignment.completed %}
+                                                        <form method="POST" action="/farmer" class="flex items-center gap-2">
+                                                            <input type="hidden" name="form_type" value="assignment_rating">
+                                                            <input type="hidden" name="task_id" value="{{ item.task_id }}">
+                                                            <input type="hidden" name="worker_id" value="{{ assignment.worker_id }}">
+                                                            <label class="flex items-center gap-1 font-semibold text-text-secondary dark:text-gray-300">
+                                                                <span class="material-symbols-outlined text-sm text-primary">star</span>{{ translate('Rate worker', 'కార్మికుడిని రేట్ చేయండి') }}
+                                                            </label>
+                                                            <select name="rating" class="rounded-full border border-primary/40 bg-white px-2 py-1 text-xs text-text-primary focus:border-primary focus:outline-none focus:ring-primary/30 dark:bg-gray-800 dark:text-gray-100">
+                                                                {% for value in [1,2,3,4,5] %}
+                                                                    <option value="{{ value }}">{{ value }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <button type="submit" class="rounded-full bg-primary px-3 py-1 font-semibold text-white hover:bg-primary-dark">{{ translate('Submit', 'సమర్పించు') }}</button>
+                                                        </form>
+                                                    {% else %}
+                                                        <span>{{ translate('Waiting for completion before rating.', 'రేట్ చేయడానికి ముందు పూర్తి కావాలి.') }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </article>
+                                        {% endfor %}
+                                    </div>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -364,7 +451,7 @@
             </section>
         </main>
 
-        <footer class="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-200 bg-background-light/95 backdrop-blur dark:border-gray-700 dark:bg-background-dark/90">
+        <!-- <footer class="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-200 bg-background-light/95 backdrop-blur dark:border-gray-700 dark:bg-background-dark/90">
             <nav class="mx-auto flex w-full max-w-4xl justify-around px-6 py-2 text-xs font-medium uppercase tracking-[0.25em] text-text-secondary dark:text-gray-400">
                 <a class="flex flex-col items-center gap-1 text-primary" href="#">
                     <span class="material-symbols-outlined text-2xl">home</span>
@@ -383,22 +470,85 @@
                     <span class="text-[10px]">{{ labels.footer_profile }}</span>
                 </a>
             </nav>
-        </footer>
+        </footer> -->
+    </div>
+
+    <div id="deleteTaskModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/50 px-4">
+        <div class="relative w-full max-w-md rounded-2xl bg-white p-6 text-text-primary shadow-xl shadow-primary/20 dark:bg-background-dark dark:text-white">
+            <button type="button" class="absolute right-4 top-4 rounded-full border border-gray-200 p-1 text-gray-500 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800" data-modal-close>
+                <span class="material-symbols-outlined text-base">close</span>
+            </button>
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300">
+                <span class="material-symbols-outlined">delete</span>
+            </div>
+            <h3 class="mt-4 text-xl font-semibold">{{ translate('Delete this posting?', 'ఈ ప్రకటనను తొలగించాలా?') }}</h3>
+            <p class="mt-2 text-sm text-text-secondary dark:text-gray-400">{{ translate('Workers will no longer see this task. This action cannot be undone.', 'ఈ పని ఇకపై కార్మికులకు కనిపించదు. ఈ చర్యను తిరస్కరించలేము.') }}</p>
+            <p class="mt-3 rounded-xl bg-primary/10 px-3 py-2 text-sm font-semibold text-primary dark:bg-primary/20" id="deleteTaskName"></p>
+            <form method="POST" action="/farmer" class="mt-6 flex flex-wrap items-center justify-end gap-3">
+                <input type="hidden" name="form_type" value="delete_task">
+                <input type="hidden" name="task_id" id="deleteTaskIdInput" value="">
+                <button type="button" class="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" data-modal-close>
+                    <span class="material-symbols-outlined text-sm">close</span>
+                    {{ translate('Cancel', 'రద్దు చేయి') }}
+                </button>
+                <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-600">
+                    <span class="material-symbols-outlined text-sm">delete_forever</span>
+                    {{ translate('Delete posting', 'ప్రకటనను తొలగించండి') }}
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
-        const toggleButton = document.getElementById('toggleTaskForm');
-        const taskForm = document.getElementById('taskForm');
-        if (toggleButton && taskForm) {
-            const labelSpan = toggleButton.querySelector('.label');
-            const newLabel = toggleButton.dataset.labelNew;
-            const hideLabel = toggleButton.dataset.labelHide;
-            toggleButton.addEventListener('click', () => {
-                const isHidden = taskForm.style.display === 'none' || taskForm.style.display === '';
-                taskForm.style.display = isHidden ? 'grid' : 'none';
-                labelSpan.textContent = isHidden ? hideLabel : newLabel;
+        (function() {
+            const toggleButton = document.getElementById('toggleTaskForm');
+            const taskForm = document.getElementById('taskForm');
+            if (toggleButton && taskForm) {
+                const labelSpan = toggleButton.querySelector('.label');
+                const newLabel = toggleButton.dataset.labelNew;
+                const hideLabel = toggleButton.dataset.labelHide;
+                toggleButton.addEventListener('click', () => {
+                    const isHidden = taskForm.style.display === 'none' || taskForm.style.display === '';
+                    taskForm.style.display = isHidden ? 'grid' : 'none';
+                    labelSpan.textContent = isHidden ? hideLabel : newLabel;
+                });
+            }
+
+            const modal = document.getElementById('deleteTaskModal');
+            if (!modal) return;
+            const taskNameEl = document.getElementById('deleteTaskName');
+            const taskIdInput = document.getElementById('deleteTaskIdInput');
+
+            const openModal = (taskId, taskName) => {
+                if (taskIdInput) taskIdInput.value = taskId || '';
+                if (taskNameEl) taskNameEl.textContent = taskName || '';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+            };
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            };
+
+            document.querySelectorAll('[data-delete-task="true"]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    openModal(button.dataset.taskId, button.dataset.taskName);
+                });
             });
-        }
+
+            modal.querySelectorAll('[data-modal-close]').forEach((button) => {
+                button.addEventListener('click', closeModal);
+            });
+
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        })();
     </script>
 </body>
 </html>
