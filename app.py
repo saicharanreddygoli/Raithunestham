@@ -10,12 +10,17 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
 from bson import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pathlib import Path
 from functools import partial
 import requests
 from requests.exceptions import RequestException
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:  # Python <3.9
+    ZoneInfo = None
 
 # Load environment variables from .env in the project root and current working directory
 load_dotenv()
@@ -34,12 +39,28 @@ if not app.secret_key:
     app.secret_key = os.urandom(32)
     logger.warning("FLASK_SECRET_KEY not set; generated a temporary key for this run.")
 
+# Configure display timezone (default Asia/Kolkata)
+DISPLAY_TIMEZONE_NAME = os.getenv('DISPLAY_TIMEZONE', 'Asia/Kolkata').strip()
+if ZoneInfo:
+    try:
+        DISPLAY_TIMEZONE = ZoneInfo(DISPLAY_TIMEZONE_NAME) if DISPLAY_TIMEZONE_NAME else None
+    except Exception:
+        logger = logging.getLogger(__name__)
+        logger.warning("Invalid DISPLAY_TIMEZONE %s; defaulting to UTC display.", DISPLAY_TIMEZONE_NAME)
+        DISPLAY_TIMEZONE = None
+else:
+    DISPLAY_TIMEZONE = None
+
 # Jinja filter to render Unix timestamps in templates
 @app.template_filter('timestamp_to_datetime')
 def timestamp_to_datetime_filter(timestamp):
     try:
         if isinstance(timestamp, (int, float)):
-            return datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M')
+            if DISPLAY_TIMEZONE:
+                dt = datetime.fromtimestamp(timestamp, DISPLAY_TIMEZONE)
+            else:
+                dt = datetime.fromtimestamp(timestamp, timezone.utc).astimezone() if timezone.utc else datetime.fromtimestamp(timestamp)
+            return dt.strftime('%Y-%m-%d %H:%M')
         # If it is already a datetime-like string, return as is
         return str(timestamp)
     except Exception:
@@ -473,6 +494,21 @@ def make_translator(lang: str):
     normalized = lang if lang in ("en", "te") else "en"
     return partial(translate_text, normalized)
 
+def normalize_object_id_str(value) -> str:
+    """Normalize ObjectId-like values to a plain 24-character hex string."""
+    if isinstance(value, ObjectId):
+        return str(value)
+    if not value:
+        return ''
+    value_str = str(value).strip()
+    if ObjectId.is_valid(value_str):
+        return value_str
+    if value_str.startswith("ObjectId(") and value_str.endswith(")"):
+        inner = value_str[9:-1].strip(" '\"")
+        if ObjectId.is_valid(inner):
+            return inner
+    return value_str
+
 
 @app.context_processor
 def inject_translation_utilities():
@@ -516,6 +552,106 @@ def ensure_worker_assignment_entry(task_id: ObjectId, worker_id: str, defaults: 
     except Exception as err:
         logger.error(f"Failed to ensure worker assignment entry for task {task_id}: {err}")
         return None
+
+def mark_task_accepted_by_worker(task_id: str, worker_id: str, worker_name: str | None = None, worker_phone: str | None = None) -> bool:
+    """Mark an existing farmer task as accepted by a worker."""
+    cleaned_task_id = normalize_object_id_str(task_id)
+    cleaned_worker_id = normalize_object_id_str(worker_id)
+    if not cleaned_task_id or not cleaned_worker_id:
+        return False
+    if not ObjectId.is_valid(cleaned_task_id):
+        logger.warning("Task id %s is not a valid ObjectId; cannot mark acceptance.", task_id)
+        return False
+    task_object_id = ObjectId(cleaned_task_id)
+    try:
+        task_doc = tasks_collection.find_one({"_id": task_object_id})
+    except Exception as err:
+        logger.error("Failed to fetch task %s for worker acceptance: %s", task_id, err)
+        return False
+    if not task_doc:
+        logger.warning("Task %s not found when attempting to mark worker acceptance.", task_id)
+        return False
+
+    accepted_workers = task_doc.get('accepted_workers') or []
+    if not isinstance(accepted_workers, list):
+        accepted_workers = list(accepted_workers)
+
+    added_worker = cleaned_worker_id not in accepted_workers
+    if added_worker:
+        accepted_workers.append(cleaned_worker_id)
+
+    ensure_worker_assignment_entry(task_object_id, cleaned_worker_id, {"accepted_at": time.time()})
+
+    try:
+        required = int(task_doc.get('num_workers', 1))
+        if required < 1:
+            required = 1
+    except Exception:
+        required = 1
+
+    current_status = task_doc.get('status') or 'open'
+    if len(accepted_workers) >= required:
+        new_status = 'filled'
+    elif current_status == 'open':
+        new_status = 'in_progress'
+    else:
+        new_status = current_status
+
+    update_fields = {"accepted_workers": accepted_workers}
+    if new_status != current_status:
+        update_fields["status"] = new_status
+
+    update_ops = {"$set": update_fields, "$pull": {"denied_by": cleaned_worker_id}}
+    try:
+        tasks_collection.update_one({"_id": task_object_id}, update_ops)
+    except Exception as err:
+        logger.error("Failed to update task %s after worker acceptance: %s", task_id, err)
+        return False
+
+    if added_worker:
+        final_worker_name = worker_name
+        final_worker_phone = worker_phone
+        if final_worker_name is None or final_worker_phone is None:
+            try:
+                worker_doc = workers_collection.find_one({"_id": ObjectId(cleaned_worker_id)})
+            except Exception:
+                worker_doc = None
+            if worker_doc:
+                if final_worker_name is None:
+                    final_worker_name = worker_doc.get('name')
+                if final_worker_phone is None:
+                    final_worker_phone = worker_doc.get('phone')
+
+        try:
+            farmer_id_for_notification = None
+            farmer_reference = task_doc.get('farmer_id')
+            if farmer_reference:
+                farmer_id_for_notification = normalize_object_id_str(farmer_reference)
+            else:
+                posted_by_candidate = normalize_object_id_str(task_doc.get('posted_by'))
+                if posted_by_candidate and ObjectId.is_valid(posted_by_candidate):
+                    farmer_lookup = farmers_collection.find_one({"_id": ObjectId(posted_by_candidate)})
+                    if farmer_lookup:
+                        farmer_id_for_notification = str(farmer_lookup['_id'])
+
+            if farmer_id_for_notification:
+                notifications_collection.insert_one({
+                    "farmer_id": farmer_id_for_notification,
+                    "worker_id": cleaned_worker_id,
+                    "task_id": cleaned_task_id,
+                    "help_request_id": task_doc.get('help_request_id'),
+                    "message": f"Your task has been accepted by worker: {final_worker_name or 'Worker'}",
+                    "worker_name": final_worker_name or 'Worker',
+                    "worker_phone": final_worker_phone or '',
+                    "task_location": task_doc.get('location'),
+                    "created_at": time.time(),
+                    "read": False
+                })
+        except Exception as err:
+            logger.error("Failed to create farmer notification for worker acceptance on task %s: %s", task_id, err)
+
+    logger.info("Marked task %s as accepted by worker %s via volunteer assistance.", cleaned_task_id, cleaned_worker_id)
+    return True
 
 # Haversine formula for distance calculation
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -1742,6 +1878,21 @@ def volunteer():
                         )
                     except Exception as e:
                         logger.error(f"Error sending worker notification for request {help_request_id}: {e}")
+
+                    task_id_for_update = normalize_object_id_str(task_details.get('task_id'))
+                    worker_id_for_update = normalize_object_id_str(help_request.get('worker_id'))
+                    if task_id_for_update:
+                        if worker_id_for_update:
+                            marked = mark_task_accepted_by_worker(
+                                task_id_for_update,
+                                worker_id_for_update,
+                                worker_name=worker_name,
+                                worker_phone=worker_phone
+                            )
+                            if not marked:
+                                logger.warning("Failed to mark task %s as accepted for worker help request %s.", task_id_for_update, help_request_id)
+                        else:
+                            logger.warning("Worker id missing for help request %s; task %s not updated.", help_request_id, task_id_for_update)
 
                     requests_collection.update_one(
                         {"_id": ObjectId(help_request_id)},
